@@ -1,0 +1,94 @@
+object Ticket: TTicket
+  Left = 911
+  Top = 179
+  Caption = #1058#1072#1083#1086#1085
+  ClientHeight = 285
+  ClientWidth = 325
+  Color = clWhite
+  Font.Charset = DEFAULT_CHARSET
+  Font.Color = clWindowText
+  Font.Height = -11
+  Font.Name = 'Tahoma'
+  Font.Style = []
+  OldCreateOrder = False
+  PixelsPerInch = 96
+  TextHeight = 13
+  object lblTitle: TLabel
+    Left = 16
+    Top = 153
+    Width = 127
+    Height = 25
+    Caption = #1054#1088#1075#1072#1085#1080#1079#1072#1094#1080#1103
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -21
+    Font.Name = 'Tahoma'
+    Font.Style = []
+    ParentFont = False
+  end
+  object lblDate: TLabel
+    Left = 16
+    Top = 184
+    Width = 46
+    Height = 25
+    Caption = #1044#1072#1090#1072
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -21
+    Font.Name = 'Tahoma'
+    Font.Style = []
+    ParentFont = False
+  end
+  object lblNumber: TLabel
+    Left = 81
+    Top = 122
+    Width = 55
+    Height = 25
+    Caption = '*000*'
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -21
+    Font.Name = 'Tahoma'
+    Font.Style = []
+    ParentFont = False
+  end
+  object lblBarcode: TLabel
+    Left = 33
+    Top = 32
+    Width = 259
+    Height = 72
+    Caption = '*00014*'
+    Font.Charset = ANSI_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -96
+    Font.Name = 'Free 3 of 9 Extended'
+    Font.Style = []
+    ParentFont = False
+  end
+  object lblRoom: TLabel
+    Left = 16
+    Top = 215
+    Width = 81
+    Height = 25
+    Caption = #1050#1072#1073#1080#1085#1077#1090
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -21
+    Font.Name = 'Tahoma'
+    Font.Style = []
+    ParentFont = False
+  end
+  object btnPrint: TButton
+    Left = 0
+    Top = 260
+    Width = 325
+    Height = 25
+    Align = alBottom
+    Caption = #1055#1077#1095#1072#1090#1100
+    ModalResult = 1
+    TabOrder = 0
+    OnClick = btnPrintClick
+    ExplicitTop = 191
+    ExplicitWidth = 250
+  end
+end
