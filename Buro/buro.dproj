@@ -73,6 +73,7 @@
         <DCC_RemoteDebug>true</DCC_RemoteDebug>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_1_Win32)'!=''">
+        <Manifest_File>$(BDS)\bin\default_app.manifest</Manifest_File>
         <VerInfo_Locale>1033</VerInfo_Locale>
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
         <DCC_RemoteDebug>false</DCC_RemoteDebug>
@@ -89,6 +90,10 @@
         </DelphiCompile>
         <DCCReference Include="uMain.pas">
             <Form>Main</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
+        <DCCReference Include="uTicket.pas">
+            <Form>Ticket</Form>
             <FormType>dfm</FormType>
         </DCCReference>
         <BuildConfiguration Include="Release">

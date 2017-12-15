@@ -5,7 +5,7 @@ interface
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.Mask, DBCtrlsEh,
-  Vcl.ExtCtrls;
+  Vcl.ExtCtrls, Vcl.Imaging.jpeg;
 
 type
   TMain = class(TForm)
@@ -42,11 +42,23 @@ type
     edROOM: TEdit;
     lblTicket: TLabel;
     edTicket: TEdit;
+    lblDOCSER: TLabel;
+    edDOCSER: TEdit;
+    lblDOCNUM: TLabel;
+    edDOCNUM: TEdit;
+    lblGOAL: TLabel;
+    edGOAL: TEdit;
     procedure btnScanClick(Sender: TObject);
     procedure edCodeKeyPress(Sender: TObject; var Key: Char);
+    procedure FormShow(Sender: TObject);
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
   private
     { Private declarations }
     procedure run;
+    procedure clear;
+    function  get_barcode(s_num: string): string;
+    procedure SaveDir;     // Сохраняем пути в реестр
+    procedure LoadDir;     // Считываем пути из реестра
   public
     { Public declarations }
   end;
@@ -57,16 +69,17 @@ var
 const
   FDIR = 'Z:\buro';
   FINI = 'data.ini';
+  FIMG = 'data.jpg';
 
 implementation
 
-uses System.IniFiles;
+uses System.IniFiles, System.Win.Registry;
 
 {$R *.dfm}
 
 procedure TMain.btnScanClick(Sender: TObject);
 begin
-  stStatus.Caption:= '';
+  clear;
   edCode.Text:='';
   edCode.SetFocus;
 end;
@@ -77,11 +90,24 @@ begin
     run;
 end;
 
+procedure TMain.FormClose(Sender: TObject; var Action: TCloseAction);
+begin
+  SaveDir;
+end;
+
+procedure TMain.FormShow(Sender: TObject);
+begin
+  LoadDir;
+  edCode.Text:='';
+  edCode.SetFocus;
+end;
+
 procedure TMain.run;
 var
   s, c_dir, s_ticket: string;
   Ini: Tinifile;
 begin
+  clear;
   if not DirectoryExists(FDIR) then
   begin
     s:= 'Папка ' + FDIR + ' не существует...';
@@ -92,36 +118,112 @@ begin
   c_dir:= FDIR+'\'+FormatDateTime('yyyy-mm-dd', now);
   if not DirectoryExists(c_dir) then
   begin
-    s:= 'Папка для копий ' + c_dir + ' не существует...';
-    Application.MessageBox(PChar(s), PChar('Внимание'));
+    stStatus.Caption:=  'Сегодня нет зарегистрированных посетителей !';
     exit;
   end;
 
-  s_ticket:='1';
+  s_ticket:=get_barcode(edCode.Text);
   c_dir:= c_dir+'\'+s_ticket;
   if not DirectoryExists(c_dir) then
   begin
-    s:= 'Папку для талона ' + c_dir + ' не существует...';
-    Application.MessageBox(PChar(s), PChar('Внимание'));
+    stStatus.Caption:=  'Посетитель с талоном ' + s_ticket + ' не зарегистрирован!';
+    stStatus.Color:= clRed;
+    Application.ProcessMessages;
     exit;
   end;
 
-  c_dir:= c_dir+'\'+FINI;
-  Ini:=TiniFile.Create(c_dir);
-  edFNAME.Text:= Ini.ReadString('Person','fname','');
-  edLNAME.Text:= Ini.ReadString('Person','lname','');
-  edSNAME.Text:= Ini.ReadString('Person','sname','');
-  edSEX.Text:= Ini.ReadString('Person','sex','');
-  edBDATE.Value:= Ini.ReadDate('Person','bdate',date);
-  edBPLACE.Text:= Ini.ReadString('Person','bplase','');
-  edWhDOC.Text:= Ini.ReadString('Person','whdoc','');
-  edDTDOC.Value:= Ini.ReadDate('Person','dtdoc',date);
-  edCODEDOC.Text:= Ini.ReadString('Person','coddoc','');
-  edMAIL.Text:= Ini.ReadString('Person','mail','');
-  edROOM.Text:= Ini.ReadString('Person','room','');
-  edTicket.Text:= Ini.ReadString('Person','ticket','');
-  edOLD.Text:= Ini.ReadString('Person','old','');
-  Ini.Free;
+  Ini:=TiniFile.Create(c_dir+'\'+FINI);
+  try
+    edDOCSER.Text:= Ini.ReadString('Person','docser','');
+    edDOCNUM.Text:= Ini.ReadString('Person','docnum','');
+    edFNAME.Text:= Ini.ReadString('Person','fname','');
+    edLNAME.Text:= Ini.ReadString('Person','lname','');
+    edSNAME.Text:= Ini.ReadString('Person','sname','');
+    edSEX.Text:= Ini.ReadString('Person','sex','');
+    edBDATE.Value:= Ini.ReadDate('Person','bdate',date);
+    edBPLACE.Text:= Ini.ReadString('Person','bplase','');
+    edWhDOC.Text:= Ini.ReadString('Person','whdoc','');
+    edDTDOC.Value:= Ini.ReadDate('Person','dtdoc',date);
+    edCODEDOC.Text:= Ini.ReadString('Person','coddoc','');
+    edMAIL.Text:= Ini.ReadString('Person','mail','');
+    edROOM.Text:= Ini.ReadString('Person','room','');
+    edTicket.Text:= Ini.ReadString('Person','ticket','');
+    edOLD.Text:= Ini.ReadString('Person','old','');
+    edGOAL.Text:= Ini.ReadString('Person','goal','');
+    imgPerson.Picture.LoadFromFile(c_dir+'\'+FIMG);
+    imgPerson.Show;
+  finally
+    Ini.Free;
+    stStatus.Caption:=  'Посетитель с талоном ' + s_ticket + ' зарегистрирован!';
+    stStatus.Color:= clLime;
+    Application.ProcessMessages;
+    sleep(1000);
+    edCode.Text:= '';
+  end;
+end;
+
+procedure TMain.SaveDir;
+var Reg: TRegIniFile;
+begin
+  // Сохраняем пути в реестр
+  Reg:= TRegIniFile.Create('Software');
+  try
+    Reg.OpenKey(ExtractFileName(ParamStr(0)), true);
+    Reg.WriteInteger(Name, 'Left',   Main.Left);
+    Reg.WriteInteger(Name, 'Top',    Main.Top);
+    Reg.WriteInteger(Name, 'Height', Main.Height);
+    Reg.WriteInteger(Name, 'Width',  Main.Width);
+//    Reg.WriteString (Name, 'Flt',    edFlt.Value);
+//    Reg.WriteString (Name, 'Src',    edSrc.Value);
+//    Reg.WriteString (Name, 'Cpy',    edCpy.Value);
+  finally
+    Reg.Free;
+  end;
+end;
+
+procedure TMain.LoadDir;
+var
+  Reg: TRegIniFile;
+begin
+  // Считываем пути из реестра
+  Reg:= TRegIniFile.Create('Software');
+  try
+    Reg.OpenKey(ExtractFileName(ParamStr(0)), true);
+    Main.Left:=    Reg.ReadInteger(Name, 'Left',   Main.Left);
+    Main.Top:=     Reg.ReadInteger(Name, 'Top',    Main.Top);
+    Main.Height:=  Reg.ReadInteger(Name, 'Height', Main.Height);
+    Main.Width:=   Reg.ReadInteger(Name, 'Width',  Main.Width);
+  finally
+    Reg.Free;
+  end;
+end;
+
+procedure TMain.clear;
+begin
+  stStatus.Caption:= '';
+  stStatus.Color:= clBtnFace;
+  edDOCSER.Text:= '';
+  edDOCNUM.Text:= '';
+  edLNAME.Text:= '';
+  edFNAME.Text:= '';
+  edSNAME.Text:= '';
+  edSEX.Text:= '';
+  edBDATE.Text:= '';
+  edBPLACE.Text:= '';
+  edWhDOC.Text:= '';
+  edDTDOC.Text:= '';
+  edCODEDOC.Text:= '';
+  edMAIL.Text:= '';
+  edOLD.Text:= '';
+  edROOM.Text:= '';
+  edTicket.Text:='';
+  imgPerson.Hide;
+end;
+
+function TMain.get_barcode(s_num: string): string;
+begin
+  Result:=StringReplace(s_num, '*', '',[rfReplaceAll]);
+  //IntToStr(StrToIntDef(StringReplace(s_num, '*', '',[rfReplaceAll]), 0));
 end;
 
 end.
