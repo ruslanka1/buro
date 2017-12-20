@@ -45,6 +45,15 @@ object Main: TMain
       TabOrder = 2
       OnClick = btnPrintClick
     end
+    object btnSend: TButton
+      Left = 251
+      Top = 10
+      Width = 75
+      Height = 25
+      Caption = #1054#1090#1087#1088#1072#1074#1080#1090#1100
+      TabOrder = 3
+      OnClick = btnSendClick
+    end
     object btnScan: TButton
       Left = 89
       Top = 10

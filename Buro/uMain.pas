@@ -1,7 +1,12 @@
 unit uMain;
 
+{$IFDEF FPC}
+  {$MODE Delphi}
+{$ENDIF}
+
 interface
 
+{$IFDEF MSWINDOWS}
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.Mask, DBCtrlsEh,
@@ -12,15 +17,22 @@ uses
   IdSMTP, Data.Win.ADODB;
 
 type
+
+  { TMain }
+
   TMain = class(TForm)
     pnlTop: TPanel;
     btnNew: TButton;
     btnPrint: TButton;
+    btnSend: TButton;
     btnScan: TButton;
     pcPGS: TPageControl;
     tsPerson: TTabSheet;
     tsTurn: TTabSheet;
+    grdTurn: TDBGridEh;
     imgPerson: TImage;
+    sbTurn: TStatusBar;
+    pnlTurn: TPanel;
     pnlPerson: TPanel;
     lblLNAME: TLabel;
     edLNAME: TEdit;
@@ -48,6 +60,7 @@ type
     edDTDOC: TDBDateTimeEditEh;
     lblTicket: TLabel;
     edTicket: TEdit;
+    stStatus: TStaticText;
     lblDOCSER: TLabel;
     edDOCSER: TEdit;
     lblDOCNUM: TLabel;
@@ -102,6 +115,7 @@ type
     procedure btnNewClick(Sender: TObject);
     procedure btnScanClick(Sender: TObject);
     procedure btnPrintClick(Sender: TObject);
+    procedure btnSendClick(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure edBDATEExit(Sender: TObject);
@@ -116,18 +130,19 @@ type
     app_dir: string;
     f_save: boolean;
     procedure scan;
+    procedure send;
     procedure save;
     procedure clear;
     procedure calc_old;
     procedure srun(nm: string);
     procedure init_ticket;
     function  set_barcode(s_num: string): string;
-    procedure SaveDir;     // Сохраняем пути в реестр
-    procedure LoadDir;     // Считываем пути из реестра
+    procedure SaveDir;     // Г‘Г®ГµГ°Г Г­ГїГҐГ¬ ГЇГіГІГЁ Гў Г°ГҐГҐГ±ГІГ°
+    procedure LoadDir;     // Г‘Г·ГЁГІГ»ГўГ ГҐГ¬ ГЇГіГІГЁ ГЁГ§ Г°ГҐГҐГ±ГІГ°Г 
     procedure save_eva(dt: TDateTime);
     procedure CrtXML(dt: TDateTime);
-    procedure turn_refresh;// Перечитать очередь
-    procedure turn_write(lst: TStringList);  // Записать очередь
+    procedure turn_refresh;// ГЏГҐГ°ГҐГ·ГЁГІГ ГІГј Г®Г·ГҐГ°ГҐГ¤Гј
+    procedure turn_write(lst: TStringList);  // Г‡Г ГЇГЁГ±Г ГІГј Г®Г·ГҐГ°ГҐГ¤Гј
     procedure GetConLst;
     procedure GetAllFiles(Path: string; Lb: TStringList; All: boolean=False);
   public
@@ -138,15 +153,26 @@ var
   Main: TMain;
 
 const
+  {$IFDEF MSWINDOWS}
   FDIR = 'Z:\buro';
+  {$ELSE}
+  FDIR = './buro';
+  {$ENDIF}
   FINI = 'data.ini';
   FIMG = 'data.jpg';
   FEVA = 'Z:\buro\_eva';
 
 implementation
 
+{$IFDEF MSWINDOWS}
 uses System.IniFiles, Winapi.shellapi, JPEG, System.Win.Registry,
      System.DateUtils, System.Math, uTicket, System.StrUtils ;
+{$ELSE}
+uses IniFiles,
+     DateUtils, Math, StrUtils
+     , Process
+     , uTicket;
+{$ENDIF}
 
 {$R *.dfm}
 
@@ -157,7 +183,7 @@ end;
 
 procedure TMain.btnEvaIDClick(Sender: TObject);
 begin
-  Application.MessageBox('Поиск в ЕАВИИАС...','Внимание');
+  Application.MessageBox('ГЏГ®ГЁГ±ГЄ Гў Г…ГЂГ‚Г€Г€ГЂГ‘...','Г‚Г­ГЁГ¬Г Г­ГЁГҐ');
 end;
 
 procedure TMain.btnNewClick(Sender: TObject);
@@ -184,8 +210,13 @@ end;
 
 procedure TMain.calc_old;
 begin
+  {$IFDEF MSWINDOWS}
   if edBDATE.Value <> null then
     edOLD.Text:= IntToStr(YearsBetween(now, edBDATE.Value));
+  {$ELSE}
+  if edBDATE.Date <> null then
+     edOLD.Text := IntToStr ( YearsBetween (Now, edBDATE.Date) );
+  {$ENDIF}
 end;
 
 procedure TMain.clear;
@@ -249,7 +280,7 @@ procedure TMain.init_ticket;
 begin
   Ticket.mmOrg.Lines.Text:= trim(mmOrg.Lines.Text);
   Ticket.lblDate.Caption := FormatDateTime('dd.mm.yyyy', date);
-  Ticket.lblRoom.Caption:= 'Кабинет № ' + edROOM.Text;
+  Ticket.lblRoom.Caption:= 'ГЉГ ГЎГЁГ­ГҐГІ В№ ' + edROOM.Text;
   Ticket.lblNumber.Caption:= set_barcode(edTicket.Text);
   Ticket.lblBarcode.Caption:= Ticket.lblNumber.Caption;
   Ticket.fdir:= FDIR+'\'+FormatDateTime('yyyy-mm-dd', now)+'\'+Format('%.3d', [f_ticket]);
@@ -265,7 +296,7 @@ var
 begin
   if not DirectoryExists(FDIR) then
   begin
-    stStatus.Caption:=  'Нет подключения к хранилищу !';
+    stStatus.Caption:=  'ГЌГҐГІ ГЇГ®Г¤ГЄГ«ГѕГ·ГҐГ­ГЁГї ГЄ ГµГ°Г Г­ГЁГ«ГЁГ№Гі !';
     stStatus.Color:= clFuchsia;
     Application.ProcessMessages;
     exit;
@@ -274,7 +305,7 @@ begin
   c_dir:= FDIR+'\'+FormatDateTime('yyyy-mm-dd', now);
   if (not DirectoryExists(c_dir)) and (not CreateDir(c_dir)) then
   begin
-    stStatus.Caption:=  'Нет возможности начать регистрацию на сегодня !';
+    stStatus.Caption:=  'ГЌГҐГІ ГўГ®Г§Г¬Г®Г¦Г­Г®Г±ГІГЁ Г­Г Г·Г ГІГј Г°ГҐГЈГЁГ±ГІГ°Г Г¶ГЁГѕ Г­Г  Г±ГҐГЈГ®Г¤Г­Гї !';
     stStatus.Color:= clFuchsia;
     Application.ProcessMessages;
     exit;
@@ -283,7 +314,7 @@ begin
   c_dir:= c_dir+'\'+Format('%.3d', [f_ticket]);  //IntToStr(f_ticket);
   if (not DirectoryExists(c_dir)) and (not CreateDir(c_dir)) then
   begin
-    stStatus.Caption:=  'Нет возможности сохранить регистрацию посетителя !';
+    stStatus.Caption:=  'ГЌГҐГІ ГўГ®Г§Г¬Г®Г¦Г­Г®Г±ГІГЁ Г±Г®ГµГ°Г Г­ГЁГІГј Г°ГҐГЈГЁГ±ГІГ°Г Г¶ГЁГѕ ГЇГ®Г±ГҐГІГЁГІГҐГ«Гї !';
     stStatus.Color:= clFuchsia;
     Application.ProcessMessages;
     exit;
@@ -318,6 +349,7 @@ begin
   finally
     f_save:= True;
     Ini.Free;
+    f_ticket:= f_ticket+1;
   end;
 end;
 
@@ -332,8 +364,8 @@ begin
     // WinExec('D:\AISU\[PRJS]\MSE\Buro\Buro\Win32\Debug\pscan.exe',SW_RESTORE)
     srun(s)
   else
-    Application.MessageBox('Программа сканирования не найдена...','Внимание');
-  stStatus.Caption:= 'Читаю...';
+    Application.MessageBox('ГЏГ°Г®ГЈГ°Г Г¬Г¬Г  Г±ГЄГ Г­ГЁГ°Г®ГўГ Г­ГЁГї Г­ГҐ Г­Г Г©Г¤ГҐГ­Г ...','Г‚Г­ГЁГ¬Г Г­ГЁГҐ');
+  stStatus.Caption:= 'Г—ГЁГІГ Гѕ...';
   Application.ProcessMessages;
   s :=  app_dir+'scanned.txt';
   lst:= TStringList.Create;
@@ -368,17 +400,25 @@ begin
   s :=  app_dir+'scanned.jpg';
   s_out:= FDIR+'\'+FormatDateTime('yyyy-mm-dd', now)+'\'+edTicket.Text;
   if not CopyFile(PChar(s),PChar(s_out),False) then
-    Application.MessageBox('Ошибка копирования скана...','Внимание');
+    Application.MessageBox('ГЋГёГЁГЎГЄГ  ГЄГ®ГЇГЁГ°Г®ГўГ Г­ГЁГї Г±ГЄГ Г­Г ...','Г‚Г­ГЁГ¬Г Г­ГЁГҐ');
 *)
 end;
 
-procedure TMain.srun(nm: string);
+procedure TMain.send;
+begin
+  Application.MessageBox('ГЋГІГЇГ°Г ГўГ«ГїГѕ...','Г‚Г­ГЁГ¬Г Г­ГЁГҐ');
+end;
+
+function runAndWait (nm: string): Boolean;
+{$IFDEF MSWINDOWS}
 var
   SEInfo: TShellExecuteInfo;
   ExitCode: DWORD;
   ExecuteFile: string;
 //  ExecuteFile, ParamString, StartInString: string;
 begin
+  Result := False;
+
   ExecuteFile := nm;
   FillChar(SEInfo, SizeOf(SEInfo), 0);
   SEInfo.cbSize := SizeOf(TShellExecuteInfo);
@@ -397,30 +437,143 @@ begin
     nShow := SW_HIDE;
   end;
   if not ShellExecuteEx(@SEInfo) then
-    ShowMessage('Сканирование не запустилось...')
+    Exit;
+
   else
   begin
-    stStatus.Caption:= 'Идёт сканирование...';
-    Screen.Cursor:= crHourGlass;
-    try
-      repeat
-        Sleep (100);
-        Application.ProcessMessages;
-        GetExitCodeProcess(SEInfo.hProcess, ExitCode);
-      until (ExitCode <> STILL_ACTIVE)
-         or  Application.Terminated
-      ;
-      stStatus.Caption:= 'Сканирование закончено.';
-    finally
-      Screen.Cursor:= crDefault;
+    repeat
+      Sleep (100);
+      Application.ProcessMessages;
+      GetExitCodeProcess (SEInfo.hProcess, ExitCode);
+    until (ExitCode <> STILL_ACTIVE)
+       or  Application.Terminated
+    ;
+    Result := ExitCode <> STILL_ACTIVE
+  end
+{$ELSE}
+var output : ansistring;
+begin
+  Result := RunCommand ('/bin/bash',['-c', nm], output) ;
+//FIXME: save the output
+//  if Result then
+//     writeln (output);
+{$ENDIF}
+end;
+
+type
+
+Sys = class
+public
+  class function systemName () : String;
+  class function OSVersion  () : String;
+  class function command    (cmd: String; args: array of String) : Boolean;
+  class function execUrl    (url : String) : Boolean;
+end;
+
+class function Sys.systemName () : String;
+begin
+  Result := '?';
+{$IFDEF MSWINDOWS}
+  Result := 'Windows';
+{$ENDIF}
+{$IFDEF LINUX}
+  Result := 'Linux';
+{$ELSE}
+{$IFDEF UNIX}
+  Result := 'Unix';
+{$ENDIF}
+{$ENDIF}
+{$IFDEF OS_X}
+// OS X ?
+  Result := 'Mac';
+{$ENDIF}
+end;
+
+//
+// http://forum.lazarus.freepascal.org/index.php?topic=15390.0
+//
+class function Sys.OSVersion () : String;
+ var
+  osErr   : integer;
+  response: longint;
+begin
+  {$IFDEF LCLcarbon}
+  OSVersion := 'Mac OS X 10.';
+  {$ELSE}
+  {$IFDEF Linux}
+  OSVersion := 'Linux Kernel ';
+  {$ELSE}
+  {$IFDEF UNIX}
+  OSVersion := 'Unix ';
+  {$ELSE}
+  {$IFDEF WINDOWS}
+  if WindowsVersion = wv95 then OSVersion := 'Windows 95 '
+   else if WindowsVersion = wvNT4 then OSVersion := 'Windows NT v.4 '
+   else if WindowsVersion = wv98 then OSVersion := 'Windows 98 '
+   else if WindowsVersion = wvMe then OSVersion := 'Windows ME '
+   else if WindowsVersion = wv2000 then OSVersion := 'Windows 2000 '
+   else if WindowsVersion = wvXP then OSVersion := 'Windows XP '
+   else if WindowsVersion = wvServer2003 then OSVersion := 'Windows Server 2003 '
+   else if WindowsVersion = wvVista then OSVersion := 'Windows Vista '
+   else if WindowsVersion = wv7 then OSVersion := 'Windows 7 '
+   else OSVersion:= 'Windows ';
+  {$ENDIF}
+  {$ENDIF}
+  {$ENDIF}
+  {$ENDIF}
+//  Result := OSVersion
+end;
+
+class function Sys.command    (cmd: String; args: array of String) : Boolean;
+begin
+  Result := runAndWait (cmd);
+end;
+
+//
+// https://stackoverflow.com/questions/36822025/execute-url-path-in-external-program-in-haxe
+//
+
+class function Sys.execUrl (url : String) : Boolean;
+var
+   urlOpen: String;
+begin
+    case ( Sys.systemName ()[1] ) of
+      'L': urlOpen := 'xdg-open'; // Linux
+      'U': urlOpen := 'xdg-open'; // Unix
+      'M': urlOpen := 'open'    ; // Max (OS X)
+      'W': urlOpen := 'start'   ; // Windows
+      else urlOpen := 'xdg-open'; // FIXME: just hope it's true...
     end;
+    Sys.command (urlOpen, [url]);
+end;
+
+
+procedure TMain.srun(nm: string);
+begin
+  try
+    Screen.Cursor    := crHourGlass;
+    stStatus.Caption := 'РРґС‘С‚ СЃРєР°РЅРёСЂРѕРІР°РЅРёРµ...';
+    Application.ProcessMessages;
+
+    if runAndWait (nm) then
+      stStatus.Caption := 'РЎРєР°РЅРёСЂРѕРІР°РЅРёРµ Р·Р°РєРѕРЅС‡РµРЅРѕ.'
+    else
+      ShowMessage ('РЎРєР°РЅРёСЂРѕРІР°РЅРёРµ РЅРµ Р·Р°РїСѓСЃС‚РёР»РѕСЃСЊ...')
+
+  finally
+    Screen.Cursor := crDefault;
   end
 end;
 
 procedure TMain.SaveDir;
+{$IFDEF MSWINDOWS}
 var Reg: TRegIniFile;
+{$ELSE}
+  //FIXME: introduce application configuration
+{$ENDIF}
 begin
-  // Сохраняем пути в реестр
+{$IFDEF MSWINDOWS}
+  // РЎРѕС…СЂР°РЅСЏРµРј РїСѓС‚Рё РІ СЂРµРµСЃС‚СЂ
   Reg:= TRegIniFile.Create('Software');
   try
     Reg.OpenKey(ExtractFileName(ParamStr(0)), true);
@@ -438,15 +591,22 @@ begin
   finally
     Reg.Free;
   end;
+{$ELSE}
+    //FIXME: save configuration
+{$ENDIF}
 end;
 
 procedure TMain.LoadDir;
+{$IFDEF MSWINDOWS}
 var
   Reg: TRegIniFile;
   cdate: TDateTime;
   w_max: integer;
+{$ELSE}
+  //FIXME: introduce application configuration
+{$ENDIF}
 begin
-  // Считываем пути из реестра
+  // Г‘Г·ГЁГІГ»ГўГ ГҐГ¬ ГЇГіГІГЁ ГЁГ§ Г°ГҐГҐГ±ГІГ°Г 
   Reg:= TRegIniFile.Create('Software');
   try
     Reg.OpenKey(ExtractFileName(ParamStr(0)), true);
@@ -468,8 +628,12 @@ begin
     if cdate < date then
        f_ticket:=0;
   finally
+    inc(f_ticket);
     Reg.Free;
   end;
+{$ELSE}
+  //FIXME: load configuration
+{$ENDIF}
 end;
 
 procedure TMain.mtAfterScroll(DataSet: TDataSet);
@@ -481,18 +645,18 @@ procedure TMain.save_eva(dt: TDateTime);
 begin
   if not DirectoryExists(FEVA) then
   begin
-    stStatus.Caption:=  'Нет подключения к хранилищу ЕАВИИАС!';
+    stStatus.Caption:=  'ГЌГҐГІ ГЇГ®Г¤ГЄГ«ГѕГ·ГҐГ­ГЁГї ГЄ ГµГ°Г Г­ГЁГ«ГЁГ№Гі Г…ГЂГ‚Г€Г€ГЂГ‘!';
     stStatus.Color:= clFuchsia;
     Application.ProcessMessages;
     exit;
   end;
 
-  stStatus.Caption:= 'Выгружаем в XML...';
+  stStatus.Caption:= 'Г‚Г»ГЈГ°ГіГ¦Г ГҐГ¬ Гў XML...';
   Application.ProcessMessages;
   try
     CrtXML(dt);
   finally
-    stStatus.Caption:= 'Готово!';
+    stStatus.Caption:= 'ГѓГ®ГІГ®ГўГ®!';
     Application.ProcessMessages;
     sleep(1000);
     stStatus.Caption:= '';
@@ -585,8 +749,8 @@ begin
   try
     if not DirectoryExists(FDIR) then
     begin
-      s:= 'Папка источника ' + FDIR + ' не существует...';
-      Application.MessageBox(PChar(s), PChar('Внимание'));
+      s:= 'ГЏГ ГЇГЄГ  ГЁГ±ГІГ®Г·Г­ГЁГЄГ  ' + FDIR + ' Г­ГҐ Г±ГіГ№ГҐГ±ГІГўГіГҐГІ...';
+      Application.MessageBox(PChar(s), PChar('Г‚Г­ГЁГ¬Г Г­ГЁГҐ'));
       exit;
     end;
 //    s:= '2017-12-15';
@@ -694,9 +858,9 @@ begin
 
   us := Trim('mseUser');      // user
   ps := Trim('123mse123');    // password
-  ct := Trim(edEvaBD.Text);   // имя БД ЕАВИИАС МСЭ
-  ds := Trim(edEvaIP.Text);   // адрес MS SQL
-  dn := Trim(edEvaPort.Text); // порт MS SQL
+  ct := Trim(edEvaBD.Text);   // ГЁГ¬Гї ГЃГ„ Г…ГЂГ‚Г€Г€ГЂГ‘ ГЊГ‘Гќ
+  ds := Trim(edEvaIP.Text);   // Г Г¤Г°ГҐГ± MS SQL
+  dn := Trim(edEvaPort.Text); // ГЇГ®Г°ГІ MS SQL
 
   ConStr:= '';
 
@@ -708,12 +872,12 @@ begin
     ConStr:= Format(CON,[ps,us,ct,ds]);
     MSBase.ConnectionString:= ConStr;
     try
-      MSBase.Open;     // Тест
+      MSBase.Open;     // Г’ГҐГ±ГІ
       qReg.Close;
       qReg.Open;
     except
       on E: Exception do
-        stStatus.Caption:= 'Ошибка подключения к ЕАВИИАС ( '+E.Message +' )';
+        stStatus.Caption:= 'ГЋГёГЁГЎГЄГ  ГЇГ®Г¤ГЄГ«ГѕГ·ГҐГ­ГЁГї ГЄ Г…ГЂГ‚Г€Г€ГЂГ‘ ( '+E.Message +' )';
     end;
       Application.ProcessMessages;
   end;
