@@ -5,22 +5,22 @@ interface
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.Mask, DBCtrlsEh,
-  Vcl.ExtCtrls, DBGridEhGrouping, GridsEh, DBGridEh, Vcl.ComCtrls;
+  Vcl.ExtCtrls, DBGridEhGrouping, GridsEh, DBGridEh, Vcl.ComCtrls, Data.DB,
+  MemDB, ssWorks, SSheets, IdIOHandler, IdIOHandlerSocket, IdIOHandlerStack,
+  IdSSL, IdSSLOpenSSL, IdMessage, IdBaseComponent, IdComponent, IdTCPConnection,
+  IdTCPClient, IdExplicitTLSClientServerBase, IdMessageClient, IdSMTPBase,
+  IdSMTP, Data.Win.ADODB;
 
 type
   TMain = class(TForm)
     pnlTop: TPanel;
     btnNew: TButton;
     btnPrint: TButton;
-    btnSend: TButton;
     btnScan: TButton;
     pcPGS: TPageControl;
     tsPerson: TTabSheet;
     tsTurn: TTabSheet;
-    grdTurn: TDBGridEh;
     imgPerson: TImage;
-    sbTurn: TStatusBar;
-    pnlTurn: TPanel;
     pnlPerson: TPanel;
     lblLNAME: TLabel;
     edLNAME: TEdit;
@@ -48,26 +48,74 @@ type
     edDTDOC: TDBDateTimeEditEh;
     lblTicket: TLabel;
     edTicket: TEdit;
-    stStatus: TStaticText;
     lblDOCSER: TLabel;
     edDOCSER: TEdit;
     lblDOCNUM: TLabel;
     edDOCNUM: TEdit;
     lblGOAL: TLabel;
     edGOAL: TEdit;
+    stStatus: TPanel;
+    tsList: TTabSheet;
+    lblEvaID: TLabel;
+    edEvaID: TEdit;
+    btnEvaID: TButton;
+    pnlTurn: TPanel;
+    grdTurn: TDBGridEh;
+    sbTurn: TStatusBar;
+    mt: TMemTable;
+    mtNUM: TStringField;
+    mtROOM: TStringField;
+    mtLNAME: TStringField;
+    mtFNMAE: TStringField;
+    mtSNAME: TStringField;
+    mtGOAL: TStringField;
+    ds: TDataSource;
+    btnTurnRefresh: TButton;
+    pnlEva: TPanel;
+    btnEvaRefresh: TButton;
+    grdEva: TDBGridEh;
+    sbEva: TStatusBar;
+    mtReg: TMemTable;
+    mtRegNumReg: TIntegerField;
+    mtRegNmReg: TStringField;
+    mtRegBdReg: TIntegerField;
+    mtRegConnect: TStringField;
+    dsReg: TDataSource;
+    MSBase: TADOConnection;
+    qReg: TADOQuery;
+    ssw: TSSWriter;
+    lblEvaIP: TLabel;
+    edEvaIP: TEdit;
+    lblEvaBD: TLabel;
+    edEvaBD: TEdit;
+    lblEvaPort: TLabel;
+    edEvaPort: TEdit;
+    qRegGUID: TStringField;
+    qRegLNAME: TWideStringField;
+    qRegFNAME: TWideStringField;
+    qRegSNAME: TWideStringField;
+    qRegDT_MSE: TDateTimeField;
+    qRegORG: TWideStringField;
+    qRegROOM: TWideStringField;
+    lblEvaOrg: TLabel;
+    mmOrg: TMemo;
     procedure btnNewClick(Sender: TObject);
     procedure btnScanClick(Sender: TObject);
     procedure btnPrintClick(Sender: TObject);
-    procedure btnSendClick(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure edBDATEExit(Sender: TObject);
+    procedure btnEvaIDClick(Sender: TObject);
+    procedure mtAfterScroll(DataSet: TDataSet);
+    procedure btnTurnRefreshClick(Sender: TObject);
+    procedure btnEvaRefreshClick(Sender: TObject);
+    procedure grdEvaDblClick(Sender: TObject);
   private
     { Private declarations }
     f_ticket: integer;
     app_dir: string;
+    f_save: boolean;
     procedure scan;
-    procedure send;
     procedure save;
     procedure clear;
     procedure calc_old;
@@ -76,6 +124,12 @@ type
     function  set_barcode(s_num: string): string;
     procedure SaveDir;     // Сохраняем пути в реестр
     procedure LoadDir;     // Считываем пути из реестра
+    procedure save_eva(dt: TDateTime);
+    procedure CrtXML(dt: TDateTime);
+    procedure turn_refresh;// Перечитать очередь
+    procedure turn_write(lst: TStringList);  // Записать очередь
+    procedure GetConLst;
+    procedure GetAllFiles(Path: string; Lb: TStringList; All: boolean=False);
   public
     { Public declarations }
   end;
@@ -87,6 +141,7 @@ const
   FDIR = 'Z:\buro';
   FINI = 'data.ini';
   FIMG = 'data.jpg';
+  FEVA = 'Z:\buro\_eva';
 
 implementation
 
@@ -94,6 +149,16 @@ uses System.IniFiles, Winapi.shellapi, JPEG, System.Win.Registry,
      System.DateUtils, System.Math, uTicket, System.StrUtils ;
 
 {$R *.dfm}
+
+procedure TMain.btnEvaRefreshClick(Sender: TObject);
+begin
+  GetConLst;
+end;
+
+procedure TMain.btnEvaIDClick(Sender: TObject);
+begin
+  Application.MessageBox('Поиск в ЕАВИИАС...','Внимание');
+end;
 
 procedure TMain.btnNewClick(Sender: TObject);
 begin
@@ -112,10 +177,9 @@ begin
   scan;
 end;
 
-procedure TMain.btnSendClick(Sender: TObject);
+procedure TMain.btnTurnRefreshClick(Sender: TObject);
 begin
-  save;
-  send;
+  turn_refresh;
 end;
 
 procedure TMain.calc_old;
@@ -141,6 +205,13 @@ begin
   edMAIL.Text:= '';
   edOLD.Text:= '';
   edROOM.Text:= '';
+  edGOAL.Text:= '';
+  edEvaID.Text:= '';
+  mmOrg.Lines.Text:= '';
+
+  if f_save then
+    inc(f_ticket);
+  f_save:= false;
   edTicket.Text:=IntToStr(f_ticket);
   imgPerson.Hide;
 end;
@@ -168,50 +239,60 @@ begin
 end;
 
 function TMain.set_barcode(s_num: string): string;
+var dt_num: string;
 begin
-  Result:= '*'+RightStr('00000'+s_num, 5)+'*';
+  dt_num:= IntToStr(DayOfTheYear(date));
+  Result:= '*'+RightStr('000'+dt_num, 3)+RightStr('000'+s_num, 3)+'*';
 end;
 
 procedure TMain.init_ticket;
 begin
-  Ticket.lblTitle.Caption:= 'ФГБУ ФБ МСЭ';
+  Ticket.mmOrg.Lines.Text:= trim(mmOrg.Lines.Text);
   Ticket.lblDate.Caption := FormatDateTime('dd.mm.yyyy', date);
-  Ticket.lblRoom.Caption:= edROOM.Text;
+  Ticket.lblRoom.Caption:= 'Кабинет № ' + edROOM.Text;
   Ticket.lblNumber.Caption:= set_barcode(edTicket.Text);
   Ticket.lblBarcode.Caption:= Ticket.lblNumber.Caption;
+  Ticket.fdir:= FDIR+'\'+FormatDateTime('yyyy-mm-dd', now)+'\'+Format('%.3d', [f_ticket]);
+  Ticket.femail:= trim(edMAIL.Text);
   Ticket.ShowModal;
 end;
 
 procedure TMain.save;
 var
-  s, c_dir: string;
+  c_dir: string;
   Ini: Tinifile;
+  cdt: TDateTime;
 begin
   if not DirectoryExists(FDIR) then
   begin
-    s:= 'Папка ' + FDIR + ' не существует...';
-    Application.MessageBox(PChar(s), PChar('Внимание'));
+    stStatus.Caption:=  'Нет подключения к хранилищу !';
+    stStatus.Color:= clFuchsia;
+    Application.ProcessMessages;
     exit;
   end;
 
   c_dir:= FDIR+'\'+FormatDateTime('yyyy-mm-dd', now);
   if (not DirectoryExists(c_dir)) and (not CreateDir(c_dir)) then
   begin
-    s:= 'Папку для копий ' + c_dir + ' не удаётся создать...';
-    Application.MessageBox(PChar(s), PChar('Внимание'));
+    stStatus.Caption:=  'Нет возможности начать регистрацию на сегодня !';
+    stStatus.Color:= clFuchsia;
+    Application.ProcessMessages;
     exit;
   end;
 
-  c_dir:= c_dir+'\'+Format('%.5d', [f_ticket]);  //IntToStr(f_ticket);
+  c_dir:= c_dir+'\'+Format('%.3d', [f_ticket]);  //IntToStr(f_ticket);
   if (not DirectoryExists(c_dir)) and (not CreateDir(c_dir)) then
   begin
-    s:= 'Папку для талона ' + c_dir + ' не удаётся создать...';
-    Application.MessageBox(PChar(s), PChar('Внимание'));
+    stStatus.Caption:=  'Нет возможности сохранить регистрацию посетителя !';
+    stStatus.Color:= clFuchsia;
+    Application.ProcessMessages;
     exit;
   end;
 
+  cdt:= now;
   Ini:=TiniFile.Create(c_dir+'\'+FINI);
   try
+    Ini.WriteDateTime('Person','dtcreat',cdt);
     Ini.WriteString('Person','docser',edDOCSER.Text);
     Ini.WriteString('Person','docnum',edDOCNUM.Text);
     Ini.WriteString('Person','fname',edFNAME.Text);
@@ -230,10 +311,13 @@ begin
     Ini.WriteString('Person','ticket',edTicket.Text);
     Ini.WriteString('Person','old',edOLD.Text);
     Ini.WriteString('Person','goal',edGOAL.Text);
+    Ini.WriteString('Person','evaid',edEvaID.Text);
+    Ini.WriteString('Person','evaorg',mmOrg.Lines.Text);
     imgPerson.Picture.SaveToFile(c_dir+'\'+FIMG);
+    save_eva(cdt);
   finally
+    f_save:= True;
     Ini.Free;
-    f_ticket:= f_ticket+1;
   end;
 end;
 
@@ -288,11 +372,6 @@ begin
 *)
 end;
 
-procedure TMain.send;
-begin
-  Application.MessageBox('Отправляю...','Внимание');
-end;
-
 procedure TMain.srun(nm: string);
 var
   SEInfo: TShellExecuteInfo;
@@ -345,15 +424,17 @@ begin
   Reg:= TRegIniFile.Create('Software');
   try
     Reg.OpenKey(ExtractFileName(ParamStr(0)), true);
+    Reg.WriteInteger(Name, 'Max',    ord(Main.WindowState = wsMaximized));
     Reg.WriteInteger(Name, 'Left',   Main.Left);
     Reg.WriteInteger(Name, 'Top',    Main.Top);
     Reg.WriteInteger(Name, 'Height', Main.Height);
     Reg.WriteInteger(Name, 'Width',  Main.Width);
     Reg.WriteInteger(Name, 'ticket', f_ticket);
     Reg.WriteString (Name, 'sdate', DateToStr(date));
-//    Reg.WriteString (Name, 'Flt',    edFlt.Value);
-//    Reg.WriteString (Name, 'Src',    edSrc.Value);
-//    Reg.WriteString (Name, 'Cpy',    edCpy.Value);
+    Reg.WriteBool   (Name, 'save',   f_save);
+    Reg.WriteString (Name, 'eva_bd', Trim(edEvaBD.Text));
+    Reg.WriteString (Name, 'eva_ip', Trim(edEvaIP.Text));
+    Reg.WriteString (Name, 'eva_pt', Trim(edEvaPort.Text));
   finally
     Reg.Free;
   end;
@@ -363,22 +444,278 @@ procedure TMain.LoadDir;
 var
   Reg: TRegIniFile;
   cdate: TDateTime;
+  w_max: integer;
 begin
   // Считываем пути из реестра
   Reg:= TRegIniFile.Create('Software');
   try
     Reg.OpenKey(ExtractFileName(ParamStr(0)), true);
-    Main.Left:=    Reg.ReadInteger(Name, 'Left',   Main.Left);
-    Main.Top:=     Reg.ReadInteger(Name, 'Top',    Main.Top);
-    Main.Height:=  Reg.ReadInteger(Name, 'Height', Main.Height);
-    Main.Width:=   Reg.ReadInteger(Name, 'Width',  Main.Width);
-    f_ticket:=     Reg.ReadInteger(Name, 'ticket', 0);
-    cdate:=        StrToDate(Reg.ReadString (Name, 'sdate', '0'));
+    w_max:=        Reg.ReadInteger(Name, 'Max',    0);
+    if w_max = 1 then
+      Main.WindowState:= wsMaximized
+    else
+      Main.WindowState:= wsNormal;
+    Main.Left:=     Reg.ReadInteger(Name, 'Left',   Main.Left);
+    Main.Top:=      Reg.ReadInteger(Name, 'Top',    Main.Top);
+    Main.Height:=   Reg.ReadInteger(Name, 'Height', Main.Height);
+    Main.Width:=    Reg.ReadInteger(Name, 'Width',  Main.Width);
+    edEvaBD.Text:=  Reg.ReadString(Name, 'eva_bd', '');
+    edEvaIP.Text:=  Reg.ReadString(Name, 'eva_ip', '');
+    edEvaPort.Text:=Reg.ReadString(Name, 'eva_pt', '');
+    f_save:=        Reg.ReadBool   (Name, 'save',   True);
+    f_ticket:=      Reg.ReadInteger(Name, 'ticket', 0);
+    cdate:=         StrToDate(Reg.ReadString (Name, 'sdate', '01.01.1900'));
     if cdate < date then
        f_ticket:=0;
   finally
-    inc(f_ticket);
     Reg.Free;
+  end;
+end;
+
+procedure TMain.mtAfterScroll(DataSet: TDataSet);
+begin
+  sbTurn.Panels[0].Text:= Format('%d : %d', [DataSet.RecNo, DataSet.RecordCount]);
+end;
+
+procedure TMain.save_eva(dt: TDateTime);
+begin
+  if not DirectoryExists(FEVA) then
+  begin
+    stStatus.Caption:=  'Нет подключения к хранилищу ЕАВИИАС!';
+    stStatus.Color:= clFuchsia;
+    Application.ProcessMessages;
+    exit;
+  end;
+
+  stStatus.Caption:= 'Выгружаем в XML...';
+  Application.ProcessMessages;
+  try
+    CrtXML(dt);
+  finally
+    stStatus.Caption:= 'Готово!';
+    Application.ProcessMessages;
+    sleep(1000);
+    stStatus.Caption:= '';
+    Application.ProcessMessages;
+  end;
+end;
+
+procedure TMain.CrtXML(dt: TDateTime);
+var
+  s: string;
+  fXML: TStringList;
+  MyGUID : TGUID;
+
+  function sxml(str: string): string;
+  begin
+    str:= StringReplace(str,'>','',[rfReplaceAll]);
+    str:= StringReplace(str,'<','',[rfReplaceAll]);
+    Result:= trim(str);
+  end;
+
+  procedure XmlHeader;
+  begin
+    fXML.Clear;
+    fXML.Add('<?xml version="1.0" encoding="WINDOWS-1251"?>');
+    fXML.Add('<EVA xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">');
+    fXML.Add('  <PackageAttrs>');
+    fXML.Add('    <CreatingDateTime>' + FormatDateTime('yyyy-mm-dd hh:mm:ss.zzz',now) + '</CreatingDateTime>');
+    fXML.Add('    <SchemaVersion>1.0</SchemaVersion>');
+    fXML.Add('  </PackageAttrs>');
+  end;
+
+  procedure XmlFooter;
+  begin
+    fXML.Add('</EVA>');
+  end;
+
+  procedure XmlBoby;
+  begin
+    fXML.Add('  <Person>');
+    try
+      fXML.Add('    <DT>'+sxml(FormatDateTime('yyyy-mm-dd hh:mm:ss',dt))+'</DT>');
+      fXML.Add('    <ID>'+sxml(s)+'</ID>');
+      fXML.Add('    <EVAID>'+sxml(edEvaID.Text)+'</EVAID>');
+      fXML.Add('    <NUM>'+sxml(Format('%.3d', [f_ticket]))+'</NUM>');
+      fXML.Add('    <LNAME>'+sxml(edLNAME.Text)+'</LNAME>');
+      fXML.Add('    <FNAME>'+sxml(edFNAME.Text)+'</FNAME>');
+      fXML.Add('    <SNAME>'+sxml(edSNAME.Text)+'</SNAME>');
+      fXML.Add('    <BDATE>'+sxml(edBDATE.Text)+'</BDATE>');
+      fXML.Add('    <GOAL>'+sxml(edGOAL.Text)+'</GOAL>');
+    finally
+      fXML.Add('  </Person>');
+    end;
+  end;
+begin
+  if (CreateGUID(MyGUID) = 0) then
+  begin
+    s:= StringReplace(StringReplace(GUIDToString(MyGuid),'{','',[]),'}','',[]);
+    fXML:= TStringList.Create;
+    try
+      XmlHeader;
+      try
+        XmlBoby
+      finally
+        XmlFooter;
+      end;
+      fXML.SaveToFile(FEVA+'\'+s+'.xml');
+    finally
+      fXML.Free;
+    end;
+  end;
+end;
+
+procedure TMain.grdEvaDblClick(Sender: TObject);
+begin
+  if not qReg.IsEmpty then
+  begin
+    edEvaID.Text:= qRegGUID.AsString;
+    mmOrg.Lines.Text:= qRegORG.AsString;
+    edROOM.Text:=  qRegROOM.AsString;
+    pcPGS.ActivePage:= tsPerson;
+  end;
+end;
+
+procedure TMain.turn_refresh;
+var
+  s: string;
+  lst: TStringList;
+begin
+  lst:= TStringList.Create;
+  try
+    if not DirectoryExists(FDIR) then
+    begin
+      s:= 'Папка источника ' + FDIR + ' не существует...';
+      Application.MessageBox(PChar(s), PChar('Внимание'));
+      exit;
+    end;
+//    s:= '2017-12-15';
+    s:= FormatDateTime('yyyy-mm-dd', date);
+    GetAllFiles(FDIR+'\'+s, lst, True);
+    turn_write(lst);
+  finally
+    lst.Free;
+  end;
+end;
+
+procedure TMain.turn_write(lst: TStringList);
+var
+  i: integer;
+  Ini: Tinifile;
+  st: TStringList;
+begin
+  mt.DisableControls;
+  st:= TStringList.Create;
+  try
+    mt.Close;
+    mt.Open;
+    for i := 0 to lst.Count - 1 do
+    begin
+      st.Text:= StringReplace(lst[i],'\',#13#10,[rfReplaceAll]);
+      Ini:=TiniFile.Create(lst[i]);
+      try
+        mt.Append;
+        mtNUM.AsString:=   st[st.Count-2];
+        mtLNAME.AsString:= Ini.ReadString('Person','lname','');
+        mtFNMAE.AsString:= Ini.ReadString('Person','fname','');
+        mtSNAME.AsString:= Ini.ReadString('Person','sname','');
+        mtROOM.AsString:=  Ini.ReadString('Person','room','');
+        mtGOAL.AsString:=  Ini.ReadString('Person','goal','');
+        mt.Post;
+{
+        Ini.ReadString('Person','docser','');
+        Ini.ReadString('Person','docnum','');
+        Ini.ReadString('Person','fname','');
+        Ini.ReadString('Person','lname','');
+        Ini.ReadString('Person','sname','');
+        Ini.ReadString('Person','sex','');
+        Ini.ReadDate('Person','bdate',date);
+        Ini.ReadString('Person','bplase','');
+        Ini.ReadString('Person','whdoc','');
+        Ini.ReadDate('Person','dtdoc',date);
+        Ini.ReadString('Person','coddoc','');
+        Ini.ReadString('Person','mail','');
+        Ini.ReadString('Person','room','');
+        Ini.ReadString('Person','ticket','');
+        Ini.ReadString('Person','old','');
+        Ini.ReadString('Person','goal','');
+}
+      finally
+        Ini.Free;
+      end;
+    end;
+  finally
+    mt.EnableControls;
+  end;
+end;
+
+procedure TMain.GetAllFiles(Path: string; Lb: TStringList; All: boolean=False);
+var
+  sub, str: string;
+  sRec: TSearchRec;
+  isFound: boolean;
+begin
+  isFound := FindFirst( Path + '\*.*', faAnyFile, sRec ) = 0;
+  while isFound do
+  begin
+    if (sRec.Name <> '.') and (sRec.Name <> '..') then
+    begin
+      if (sRec.Attr and faDirectory) = faDirectory then
+      begin
+        if All then
+          GetAllFiles(Path + '\' + sRec.Name, Lb, All);
+      end
+      else
+      begin
+        str:= AnsiUpperCase(trim(sRec.Name));
+        sub:= AnsiUpperCase(FINI);
+        if str = sub then
+          Lb.Add(Path + '\' + sRec.Name);
+      end;
+    end;
+    Application.ProcessMessages;
+    isFound:= FindNext(sRec) = 0;
+  end;
+  FindClose(sRec);
+end;
+
+procedure TMain.GetConLst;
+const
+  CONLOG = 'ConLog.txt';
+  CON = 'Provider=SQLOLEDB.1;Password=%s;Persist Security Info=True;User ID=%s;Initial Catalog=%s;Data Source=%s';
+var
+  ConStr, us, ps, ct, ds, dn, lg: string;
+begin
+  lg:= '';
+  stStatus.Caption:= '';
+  MSBase.Close;
+  mtReg.Close;
+  mtReg.Open ;
+
+  us := Trim('mseUser');      // user
+  ps := Trim('123mse123');    // password
+  ct := Trim(edEvaBD.Text);   // имя БД ЕАВИИАС МСЭ
+  ds := Trim(edEvaIP.Text);   // адрес MS SQL
+  dn := Trim(edEvaPort.Text); // порт MS SQL
+
+  ConStr:= '';
+
+  if (ds <> '') and (dn <> '') then
+    ds:= ds + ', ' + dn;
+
+  if ds <> '' then
+  begin
+    ConStr:= Format(CON,[ps,us,ct,ds]);
+    MSBase.ConnectionString:= ConStr;
+    try
+      MSBase.Open;     // Тест
+      qReg.Close;
+      qReg.Open;
+    except
+      on E: Exception do
+        stStatus.Caption:= 'Ошибка подключения к ЕАВИИАС ( '+E.Message +' )';
+    end;
+      Application.ProcessMessages;
   end;
 end;
 

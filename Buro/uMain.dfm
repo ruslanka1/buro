@@ -2,9 +2,11 @@ object Main: TMain
   Left = 2184
   Top = 166
   Caption = #1056#1077#1075#1080#1089#1090#1088#1072#1094#1080#1103' '#1087#1086#1089#1077#1090#1080#1090#1077#1083#1103
-  ClientHeight = 336
-  ClientWidth = 701
+  ClientHeight = 381
+  ClientWidth = 714
   Color = clBtnFace
+  Constraints.MinHeight = 380
+  Constraints.MinWidth = 730
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
   Font.Height = -11
@@ -18,12 +20,12 @@ object Main: TMain
   object pnlTop: TPanel
     Left = 0
     Top = 0
-    Width = 701
+    Width = 714
     Height = 41
     Align = alTop
     TabOrder = 0
     DesignSize = (
-      701
+      714
       41)
     object btnNew: TButton
       Left = 8
@@ -39,18 +41,9 @@ object Main: TMain
       Top = 10
       Width = 75
       Height = 25
-      Caption = #1055#1077#1095#1072#1090#1100
+      Caption = #1058#1072#1083#1086#1085
       TabOrder = 2
       OnClick = btnPrintClick
-    end
-    object btnSend: TButton
-      Left = 251
-      Top = 10
-      Width = 75
-      Height = 25
-      Caption = #1054#1090#1087#1088#1072#1074#1080#1090#1100
-      TabOrder = 3
-      OnClick = btnSendClick
     end
     object btnScan: TButton
       Left = 89
@@ -61,38 +54,41 @@ object Main: TMain
       TabOrder = 1
       OnClick = btnScanClick
     end
-    object stStatus: TStaticText
-      Left = 332
-      Top = 12
-      Width = 320
-      Height = 21
+    object stStatus: TPanel
+      Left = 251
+      Top = 9
+      Width = 414
+      Height = 25
+      Alignment = taLeftJustify
       Anchors = [akLeft, akTop, akRight]
-      AutoSize = False
-      BorderStyle = sbsSunken
-      TabOrder = 4
+      BevelOuter = bvLowered
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -13
+      Font.Name = 'Tahoma'
+      Font.Style = [fsBold]
+      ParentBackground = False
+      ParentFont = False
+      TabOrder = 3
     end
   end
   object pcPGS: TPageControl
     Left = 0
     Top = 41
-    Width = 701
-    Height = 295
+    Width = 714
+    Height = 340
     ActivePage = tsPerson
     Align = alClient
     TabOrder = 1
-    ExplicitWidth = 353
-    ExplicitHeight = 392
+    ExplicitHeight = 300
     object tsPerson: TTabSheet
       Caption = #1055#1086#1089#1077#1090#1080#1090#1077#1083#1100
-      ExplicitLeft = 0
-      ExplicitTop = 32
-      ExplicitWidth = 550
-      ExplicitHeight = 364
+      ExplicitHeight = 272
       object imgPerson: TImage
         Left = 0
         Top = 0
-        Width = 128
-        Height = 267
+        Width = 141
+        Height = 312
         Align = alClient
         Proportional = True
         Stretch = True
@@ -102,14 +98,13 @@ object Main: TMain
         ExplicitHeight = 105
       end
       object pnlPerson: TPanel
-        Left = 128
+        Left = 141
         Top = 0
         Width = 565
-        Height = 267
+        Height = 312
         Align = alRight
         TabOrder = 0
-        ExplicitLeft = 129
-        ExplicitHeight = 228
+        ExplicitHeight = 272
         object lblLNAME: TLabel
           Left = 51
           Top = 47
@@ -199,12 +194,12 @@ object Main: TMain
           Caption = #1042#1086#1079#1088#1072#1089#1090
         end
         object lblROOM: TLabel
-          Left = 246
+          Left = 260
           Top = 182
           Width = 43
           Height = 13
           Alignment = taRightJustify
-          Caption = #1050#1086#1084#1085#1072#1090#1072
+          Caption = #1050#1072#1073#1080#1085#1077#1090
         end
         object lblTicket: TLabel
           Left = 360
@@ -237,6 +232,22 @@ object Main: TMain
           Height = 13
           Alignment = taRightJustify
           Caption = #1062#1077#1083#1100' '#1074#1080#1079#1080#1090#1072
+        end
+        object lblEvaID: TLabel
+          Left = 48
+          Top = 236
+          Width = 47
+          Height = 13
+          Alignment = taRightJustify
+          Caption = #1045#1040#1042#1048#1048#1040#1057
+        end
+        object lblEvaOrg: TLabel
+          Left = 59
+          Top = 263
+          Width = 36
+          Height = 13
+          Alignment = taRightJustify
+          Caption = #1057#1086#1089#1090#1072#1074
         end
         object edLNAME: TEdit
           Left = 101
@@ -290,7 +301,7 @@ object Main: TMain
         object edMAIL: TEdit
           Left = 101
           Top = 179
-          Width = 130
+          Width = 153
           Height = 21
           TabOrder = 11
         end
@@ -303,7 +314,7 @@ object Main: TMain
           TabOrder = 14
         end
         object edROOM: TEdit
-          Left = 295
+          Left = 309
           Top = 179
           Width = 45
           Height = 21
@@ -359,23 +370,64 @@ object Main: TMain
           Height = 21
           TabOrder = 15
         end
+        object edEvaID: TEdit
+          Left = 101
+          Top = 233
+          Width = 340
+          Height = 21
+          ReadOnly = True
+          TabOrder = 16
+        end
+        object btnEvaID: TButton
+          Left = 447
+          Top = 233
+          Width = 73
+          Height = 21
+          Caption = #1053#1072#1081#1090#1080
+          TabOrder = 17
+          OnClick = btnEvaIDClick
+        end
+        object mmOrg: TMemo
+          Left = 101
+          Top = 260
+          Width = 420
+          Height = 32
+          TabOrder = 18
+        end
       end
     end
     object tsTurn: TTabSheet
       Caption = #1054#1095#1077#1088#1077#1076#1100
       ImageIndex = 1
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
+      ExplicitHeight = 272
+      object pnlTurn: TPanel
+        Left = 0
+        Top = 0
+        Width = 706
+        Height = 30
+        Align = alTop
+        BevelOuter = bvNone
+        TabOrder = 0
+        object btnTurnRefresh: TButton
+          Left = 4
+          Top = 1
+          Width = 75
+          Height = 25
+          Caption = #1054#1073#1085#1086#1074#1080#1090#1100
+          TabOrder = 0
+          OnClick = btnTurnRefreshClick
+        end
+      end
       object grdTurn: TDBGridEh
         Left = 0
-        Top = 25
-        Width = 693
-        Height = 223
+        Top = 30
+        Width = 706
+        Height = 263
         Align = alClient
+        AutoFitColWidths = True
         FilterEditMode = False
         DataGrouping.GroupLevels = <>
+        DataSource = ds
         Flat = False
         FooterColor = clWindow
         FooterFont.Charset = DEFAULT_CHARSET
@@ -385,19 +437,60 @@ object Main: TMain
         FooterFont.Style = []
         OptionsEh = [dghFixed3D, dghHighlightFocus, dghClearSelection, dghDialogFind, dghColumnResize, dghColumnMove, dghExtendVertLines, dghHideFilterDoApply, dghHighlightNull]
         RowDetailPanel.Color = clBtnFace
-        TabOrder = 0
+        TabOrder = 1
         TitleFont.Charset = DEFAULT_CHARSET
         TitleFont.Color = clWindowText
         TitleFont.Height = -11
         TitleFont.Name = 'Tahoma'
         TitleFont.Style = []
+        Columns = <
+          item
+            AutoFitColWidth = False
+            EditButtons = <>
+            FieldName = 'NUM'
+            Footers = <>
+            Width = 50
+          end
+          item
+            AutoFitColWidth = False
+            EditButtons = <>
+            FieldName = 'ROOM'
+            Footers = <>
+            Width = 50
+          end
+          item
+            AutoFitColWidth = False
+            EditButtons = <>
+            FieldName = 'LNAME'
+            Footers = <>
+            Width = 100
+          end
+          item
+            AutoFitColWidth = False
+            EditButtons = <>
+            FieldName = 'FNAME'
+            Footers = <>
+            Width = 100
+          end
+          item
+            AutoFitColWidth = False
+            EditButtons = <>
+            FieldName = 'SNAME'
+            Footers = <>
+            Width = 100
+          end
+          item
+            EditButtons = <>
+            FieldName = 'GOAL'
+            Footers = <>
+          end>
         object RowDetailData: TRowDetailPanelControlEh
         end
       end
       object sbTurn: TStatusBar
         Left = 0
-        Top = 248
-        Width = 693
+        Top = 293
+        Width = 706
         Height = 19
         Panels = <
           item
@@ -407,15 +500,317 @@ object Main: TMain
             Width = 50
           end>
       end
-      object pnlTurn: TPanel
+    end
+    object tsList: TTabSheet
+      Caption = #1057#1087#1080#1089#1086#1082
+      ImageIndex = 2
+      ExplicitHeight = 272
+      object pnlEva: TPanel
         Left = 0
         Top = 0
-        Width = 693
-        Height = 25
+        Width = 706
+        Height = 30
         Align = alTop
         BevelOuter = bvNone
-        TabOrder = 2
+        TabOrder = 0
+        object lblEvaIP: TLabel
+          Left = 125
+          Top = 6
+          Width = 10
+          Height = 13
+          Alignment = taRightJustify
+          Caption = 'IP'
+        end
+        object lblEvaBD: TLabel
+          Left = 281
+          Top = 6
+          Width = 14
+          Height = 13
+          Alignment = taRightJustify
+          Caption = #1041#1044
+        end
+        object lblEvaPort: TLabel
+          Left = 446
+          Top = 8
+          Width = 25
+          Height = 13
+          Alignment = taRightJustify
+          Caption = #1055#1086#1088#1090
+        end
+        object btnEvaRefresh: TButton
+          Left = 4
+          Top = 1
+          Width = 75
+          Height = 25
+          Caption = #1054#1073#1085#1086#1074#1080#1090#1100
+          TabOrder = 0
+          OnClick = btnEvaRefreshClick
+        end
+        object edEvaIP: TEdit
+          Left = 141
+          Top = 3
+          Width = 130
+          Height = 21
+          TabOrder = 1
+        end
+        object edEvaBD: TEdit
+          Left = 301
+          Top = 3
+          Width = 130
+          Height = 21
+          TabOrder = 2
+        end
+        object edEvaPort: TEdit
+          Left = 477
+          Top = 3
+          Width = 44
+          Height = 21
+          TabOrder = 3
+        end
+      end
+      object grdEva: TDBGridEh
+        Left = 0
+        Top = 30
+        Width = 706
+        Height = 263
+        Align = alClient
+        AutoFitColWidths = True
+        FilterEditMode = False
+        DataGrouping.GroupLevels = <>
+        DataSource = dsReg
+        Flat = False
+        FooterColor = clWindow
+        FooterFont.Charset = DEFAULT_CHARSET
+        FooterFont.Color = clWindowText
+        FooterFont.Height = -11
+        FooterFont.Name = 'Tahoma'
+        FooterFont.Style = []
+        OptionsEh = [dghFixed3D, dghHighlightFocus, dghClearSelection, dghDialogFind, dghColumnResize, dghColumnMove, dghExtendVertLines, dghHideFilterDoApply, dghHighlightNull]
+        RowDetailPanel.Color = clBtnFace
+        TabOrder = 1
+        TitleFont.Charset = DEFAULT_CHARSET
+        TitleFont.Color = clWindowText
+        TitleFont.Height = -11
+        TitleFont.Name = 'Tahoma'
+        TitleFont.Style = []
+        OnDblClick = grdEvaDblClick
+        Columns = <
+          item
+            AutoFitColWidth = False
+            EditButtons = <>
+            FieldName = 'LNAME'
+            Footers = <>
+            Width = 100
+          end
+          item
+            AutoFitColWidth = False
+            EditButtons = <>
+            FieldName = 'FNAME'
+            Footers = <>
+            Width = 100
+          end
+          item
+            AutoFitColWidth = False
+            EditButtons = <>
+            FieldName = 'SNAME'
+            Footers = <>
+            Width = 100
+          end
+          item
+            AutoFitColWidth = False
+            EditButtons = <>
+            FieldName = 'DT_MSE'
+            Footers = <>
+            Width = 150
+          end
+          item
+            AutoFitColWidth = False
+            EditButtons = <>
+            FieldName = 'ROOM'
+            Footers = <>
+            Width = 50
+          end
+          item
+            EditButtons = <>
+            FieldName = 'ORG'
+            Footers = <>
+            Width = 200
+          end>
+        object RowDetailData: TRowDetailPanelControlEh
+        end
+      end
+      object sbEva: TStatusBar
+        Left = 0
+        Top = 293
+        Width = 706
+        Height = 19
+        Panels = <
+          item
+            Width = 100
+          end
+          item
+            Width = 50
+          end>
       end
     end
+  end
+  object mt: TMemTable
+    AfterScroll = mtAfterScroll
+    Left = 304
+    Top = 56
+    object mtNUM: TStringField
+      DisplayLabel = #1053#1086#1084#1077#1088
+      FieldName = 'NUM'
+      Size = 10
+    end
+    object mtROOM: TStringField
+      DisplayLabel = #1050#1072#1073#1080#1085#1077#1090
+      FieldName = 'ROOM'
+      Size = 10
+    end
+    object mtLNAME: TStringField
+      DisplayLabel = #1060#1072#1084#1080#1083#1080#1103
+      FieldName = 'LNAME'
+      Size = 30
+    end
+    object mtFNMAE: TStringField
+      DisplayLabel = #1048#1084#1103
+      FieldName = 'FNAME'
+      Size = 30
+    end
+    object mtSNAME: TStringField
+      DisplayLabel = #1054#1090#1095#1077#1089#1090#1074#1086
+      FieldName = 'SNAME'
+      Size = 30
+    end
+    object mtGOAL: TStringField
+      DisplayLabel = #1062#1077#1083#1100' '#1074#1080#1079#1080#1090#1072
+      FieldName = 'GOAL'
+      Size = 50
+    end
+  end
+  object ds: TDataSource
+    DataSet = mt
+    Left = 344
+    Top = 56
+  end
+  object mtReg: TMemTable
+    Left = 304
+    Top = 8
+    object mtRegNumReg: TIntegerField
+      DisplayLabel = 'NN'
+      FieldName = 'NumReg'
+    end
+    object mtRegNmReg: TStringField
+      DisplayLabel = #1053#1072#1079#1074#1072#1085#1080#1077' '#1088#1077#1075#1080#1086#1085#1072
+      FieldName = 'NmReg'
+      Size = 60
+    end
+    object mtRegBdReg: TIntegerField
+      DisplayLabel = #1041#1044
+      FieldName = 'BdReg'
+    end
+    object mtRegConnect: TStringField
+      DisplayLabel = #1055#1086#1076#1082#1083#1102#1095#1077#1085#1080#1077
+      FieldName = 'Connect'
+      Size = 200
+    end
+  end
+  object dsReg: TDataSource
+    DataSet = qReg
+    Left = 352
+    Top = 8
+  end
+  object MSBase: TADOConnection
+    ConnectionString = 
+      'Provider=SQLOLEDB.1;Password=123mse123;Persist Security Info=Tru' +
+      'e;User ID=mseUser;Initial Catalog=FMBA_MSE_1277;Data Source=BD2'
+    ConnectionTimeout = 30
+    IsolationLevel = ilBrowse
+    KeepConnection = False
+    LoginPrompt = False
+    Mode = cmRead
+    Provider = 'SQLOLEDB.1'
+    Left = 400
+    Top = 8
+  end
+  object qReg: TADOQuery
+    Connection = MSBase
+    CursorType = ctStatic
+    Parameters = <>
+    SQL.Strings = (
+      'DECLARE @DD1 as DATE, @DD2 as DATE'
+      'SET @DD1 = GETDATE()'
+      ''
+      'SELECT'
+      '  isnull(convert(char(36),  EXR.RecipientPersonId),'#39#39') as [GUID]'
+      ', isnull(convert(nchar(30), EXR.LastName), '#39#39') AS LNAME'
+      ', isnull(convert(nchar(30), EXR.FirstName), '#39#39') AS FNAME'
+      ', isnull(convert(nchar(30), EXR.SecondName), '#39#39') AS SNAME'
+      ', isnull(EXR.AppointmentDT, '#39#39') AS DT_MSE'
+      ', isnull(convert(nchar(100), DOR.ORGANIZATION_NAME), '#39#39') AS ORG'
+      ', isnull(convert(nchar(10), DOR.Room), '#39#39') AS ROOM'
+      ''
+      'FROM [dbo].[ExamRecordListView] EXR'
+      ''
+      'JOIN Person PSR on PSR.PersonID = EXR.RecipientPersonId'
+      'JOIN DicOrganization DOR on DOR.ORGANIZATION_ID = EXR.BuroId'
+      ''
+      'WHERE CAST (EXR.AppointmentDT as date) = @DD1'
+      ';')
+    Left = 448
+    Top = 8
+    object qRegGUID: TStringField
+      FieldName = 'GUID'
+      ReadOnly = True
+      FixedChar = True
+      Size = 36
+    end
+    object qRegLNAME: TWideStringField
+      DisplayLabel = #1060#1072#1084#1080#1083#1080#1103
+      FieldName = 'LNAME'
+      ReadOnly = True
+      FixedChar = True
+      Size = 30
+    end
+    object qRegFNAME: TWideStringField
+      DisplayLabel = #1048#1084#1103
+      FieldName = 'FNAME'
+      ReadOnly = True
+      FixedChar = True
+      Size = 30
+    end
+    object qRegSNAME: TWideStringField
+      DisplayLabel = #1054#1090#1095#1077#1089#1090#1074#1086
+      FieldName = 'SNAME'
+      ReadOnly = True
+      FixedChar = True
+      Size = 30
+    end
+    object qRegDT_MSE: TDateTimeField
+      DisplayLabel = #1047#1072#1087#1080#1089#1100' '#1085#1072' '#1052#1057#1069
+      FieldName = 'DT_MSE'
+      ReadOnly = True
+    end
+    object qRegORG: TWideStringField
+      DisplayLabel = #1057#1086#1089#1090#1072#1074
+      FieldName = 'ORG'
+      ReadOnly = True
+      FixedChar = True
+      Size = 100
+    end
+    object qRegROOM: TWideStringField
+      DisplayLabel = #1050#1072#1073#1080#1085#1077#1090
+      FieldName = 'ROOM'
+      ReadOnly = True
+      FixedChar = True
+      Size = 10
+    end
+  end
+  object ssw: TSSWriter
+    NewSheetName = #1057#1090#1088#1072#1085#1080#1094#1072
+    Server = sssExcel
+    Left = 496
+    Top = 8
   end
 end

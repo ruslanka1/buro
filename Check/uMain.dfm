@@ -1,17 +1,18 @@
 object Main: TMain
-  Left = 2159
-  Top = 568
+  Left = 2186
+  Top = 576
   Caption = #1055#1088#1086#1087#1091#1089#1082#1085#1086#1081' '#1087#1091#1085#1082#1090
-  ClientHeight = 335
-  ClientWidth = 801
+  ClientHeight = 291
+  ClientWidth = 714
   Color = clBtnFace
+  Constraints.MinHeight = 330
+  Constraints.MinWidth = 730
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
   Font.Height = -11
   Font.Name = 'Tahoma'
   Font.Style = []
   OldCreateOrder = False
-  WindowState = wsMaximized
   OnClose = FormClose
   OnShow = FormShow
   PixelsPerInch = 96
@@ -19,13 +20,12 @@ object Main: TMain
   object pnlTop: TPanel
     Left = 0
     Top = 0
-    Width = 801
+    Width = 714
     Height = 41
     Align = alTop
     TabOrder = 0
-    ExplicitWidth = 854
     DesignSize = (
-      801
+      714
       41)
     object btnScan: TButton
       Left = 8
@@ -48,21 +48,20 @@ object Main: TMain
       Visible = True
       OnKeyPress = edCodeKeyPress
     end
-    object stStatus: TStaticText
-      Left = 219
-      Top = 13
-      Width = 536
-      Height = 21
+    object stStatus: TPanel
+      Left = 215
+      Top = 9
+      Width = 453
+      Height = 25
+      Alignment = taLeftJustify
       Anchors = [akLeft, akTop, akRight]
-      AutoSize = False
-      BorderStyle = sbsSunken
-      Color = clBtnFace
+      BevelOuter = bvLowered
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clWindowText
       Font.Height = -13
       Font.Name = 'Tahoma'
       Font.Style = [fsBold]
-      ParentColor = False
+      ParentBackground = False
       ParentFont = False
       TabOrder = 2
     end
@@ -70,18 +69,15 @@ object Main: TMain
   object pnlDetails: TPanel
     Left = 0
     Top = 41
-    Width = 801
-    Height = 294
+    Width = 714
+    Height = 250
     Align = alClient
     TabOrder = 1
-    ExplicitTop = 40
-    ExplicitWidth = 987
-    ExplicitHeight = 457
     object imgPerson: TImage
       Left = 1
       Top = 1
-      Width = 234
-      Height = 292
+      Width = 147
+      Height = 248
       Align = alClient
       Picture.Data = {
         0A544A504547496D61676513190000FFD8FFE000104A46494600010101006000
@@ -294,15 +290,12 @@ object Main: TMain
       ExplicitHeight = 105
     end
     object pnlPerson: TPanel
-      Left = 235
+      Left = 148
       Top = 1
       Width = 565
-      Height = 292
+      Height = 248
       Align = alRight
       TabOrder = 0
-      ExplicitLeft = 129
-      ExplicitTop = 0
-      ExplicitHeight = 183
       object lblLNAME: TLabel
         Left = 51
         Top = 47
