@@ -99,6 +99,7 @@ type
     qRegROOM: TWideStringField;
     lblEvaOrg: TLabel;
     mmOrg: TMemo;
+    mtBDATE: TStringField;
     procedure btnNewClick(Sender: TObject);
     procedure btnScanClick(Sender: TObject);
     procedure btnPrintClick(Sender: TObject);
@@ -609,26 +610,30 @@ begin
 end;
 
 procedure TMain.turn_write(lst: TStringList);
+  function set_code(s_num: string): string;
+  var dt_num: string;
+  begin
+    dt_num:= IntToStr(DayOfTheYear(date));
+    Result:= RightStr('000'+dt_num, 3)+RightStr('000'+s_num, 3);
+  end;
 var
   i: integer;
   Ini: Tinifile;
-  st: TStringList;
 begin
   mt.DisableControls;
-  st:= TStringList.Create;
   try
     mt.Close;
     mt.Open;
     for i := 0 to lst.Count - 1 do
     begin
-      st.Text:= StringReplace(lst[i],'\',#13#10,[rfReplaceAll]);
       Ini:=TiniFile.Create(lst[i]);
       try
         mt.Append;
-        mtNUM.AsString:=   st[st.Count-2];
+        mtNUM.AsString:=   set_code(Ini.ReadString('Person','ticket',''));
         mtLNAME.AsString:= Ini.ReadString('Person','lname','');
         mtFNMAE.AsString:= Ini.ReadString('Person','fname','');
         mtSNAME.AsString:= Ini.ReadString('Person','sname','');
+        mtBDATE.AsString:= Ini.ReadString('Person','bdate','');
         mtROOM.AsString:=  Ini.ReadString('Person','room','');
         mtGOAL.AsString:=  Ini.ReadString('Person','goal','');
         mt.Post;
@@ -649,6 +654,8 @@ begin
         Ini.ReadString('Person','ticket','');
         Ini.ReadString('Person','old','');
         Ini.ReadString('Person','goal','');
+        Ini.ReadString('Person','evaid','');
+        Ini.ReadString('Person','evaorg','');
 }
       finally
         Ini.Free;

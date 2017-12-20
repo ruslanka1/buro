@@ -77,7 +77,7 @@ object Main: TMain
     Top = 41
     Width = 714
     Height = 330
-    ActivePage = tsPerson
+    ActivePage = tsTurn
     Align = alClient
     TabOrder = 1
     ExplicitHeight = 300
@@ -402,7 +402,6 @@ object Main: TMain
     object tsTurn: TTabSheet
       Caption = #1054#1095#1077#1088#1077#1076#1100
       ImageIndex = 1
-      ExplicitHeight = 303
       object pnlTurn: TPanel
         Left = 0
         Top = 0
@@ -484,6 +483,14 @@ object Main: TMain
             Width = 100
           end
           item
+            Alignment = taCenter
+            AutoFitColWidth = False
+            EditButtons = <>
+            FieldName = 'BDATE'
+            Footers = <>
+            Width = 80
+          end
+          item
             EditButtons = <>
             FieldName = 'GOAL'
             Footers = <>
@@ -505,13 +512,11 @@ object Main: TMain
           item
             Width = 50
           end>
-        ExplicitTop = 284
       end
     end
     object tsList: TTabSheet
       Caption = #1057#1087#1080#1089#1086#1082
       ImageIndex = 2
-      ExplicitHeight = 312
       object pnlEva: TPanel
         Left = 0
         Top = 0
@@ -661,7 +666,6 @@ object Main: TMain
           item
             Width = 50
           end>
-        ExplicitTop = 293
       end
     end
   end
@@ -693,6 +697,11 @@ object Main: TMain
       DisplayLabel = #1054#1090#1095#1077#1089#1090#1074#1086
       FieldName = 'SNAME'
       Size = 30
+    end
+    object mtBDATE: TStringField
+      DisplayLabel = #1056#1086#1076#1080#1083#1089#1103
+      FieldName = 'BDATE'
+      Size = 12
     end
     object mtGOAL: TStringField
       DisplayLabel = #1062#1077#1083#1100' '#1074#1080#1079#1080#1090#1072
