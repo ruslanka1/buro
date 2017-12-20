@@ -21,6 +21,7 @@ type
     mtNUM: TStringField;
     mtGOAL: TStringField;
     Timer: TTimer;
+    mtORG: TStringField;
     procedure FormShow(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure mtAfterScroll(DataSet: TDataSet);
@@ -46,7 +47,7 @@ const
 
 implementation
 
-uses System.Win.Registry, System.IniFiles;
+uses System.Win.Registry, System.IniFiles, DateUtils, StrUtils;
 
 {$R *.dfm}
 
@@ -96,27 +97,31 @@ begin
 end;
 
 procedure TMain.turn_write(lst: TStringList);
+  function set_code(s_num: string): string;
+  var dt_num: string;
+  begin
+    dt_num:= IntToStr(DayOfTheYear(date));
+    Result:= RightStr('000'+dt_num, 3)+RightStr('000'+s_num, 3);
+  end;
 var
   i: integer;
   Ini: Tinifile;
-  st: TStringList;
 begin
   mt.DisableControls;
-  st:= TStringList.Create;
   try
     mt.Close;
     mt.Open;
     for i := 0 to lst.Count - 1 do
     begin
-      st.Text:= StringReplace(lst[i],'\',#13#10,[rfReplaceAll]);
       Ini:=TiniFile.Create(lst[i]);
       try
         mt.Append;
-        mtNUM.AsString:=   st[st.Count-2];
+        mtNUM.AsString:=   set_code(Ini.ReadString('Person','ticket',''));
         mtLNAME.AsString:= Ini.ReadString('Person','lname','');
         mtFNMAE.AsString:= Ini.ReadString('Person','fname','');
         mtSNAME.AsString:= Ini.ReadString('Person','sname','');
         mtROOM.AsString:=  Ini.ReadString('Person','room','');
+        mtORG.AsString:=   Ini.ReadString('Person','evaorg','');
         mtGOAL.AsString:=  Ini.ReadString('Person','goal','');
         mt.Post;
 {
@@ -142,6 +147,7 @@ begin
       end;
     end;
   finally
+    mt.Last;
     mt.EnableControls;
   end;
 end;

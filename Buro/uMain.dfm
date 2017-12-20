@@ -1,11 +1,11 @@
 object Main: TMain
-  Left = 2184
-  Top = 166
+  Left = 2181
+  Top = 146
   Caption = #1056#1077#1075#1080#1089#1090#1088#1072#1094#1080#1103' '#1087#1086#1089#1077#1090#1080#1090#1077#1083#1103
-  ClientHeight = 381
+  ClientHeight = 371
   ClientWidth = 714
   Color = clBtnFace
-  Constraints.MinHeight = 380
+  Constraints.MinHeight = 410
   Constraints.MinWidth = 730
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -76,19 +76,22 @@ object Main: TMain
     Left = 0
     Top = 41
     Width = 714
-    Height = 340
+    Height = 330
     ActivePage = tsPerson
     Align = alClient
     TabOrder = 1
     ExplicitHeight = 300
     object tsPerson: TTabSheet
       Caption = #1055#1086#1089#1077#1090#1080#1090#1077#1083#1100
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
       ExplicitHeight = 272
       object imgPerson: TImage
         Left = 0
         Top = 0
         Width = 141
-        Height = 312
+        Height = 302
         Align = alClient
         Proportional = True
         Stretch = True
@@ -101,7 +104,7 @@ object Main: TMain
         Left = 141
         Top = 0
         Width = 565
-        Height = 312
+        Height = 302
         Align = alRight
         TabOrder = 0
         ExplicitHeight = 272
@@ -399,7 +402,7 @@ object Main: TMain
     object tsTurn: TTabSheet
       Caption = #1054#1095#1077#1088#1077#1076#1100
       ImageIndex = 1
-      ExplicitHeight = 272
+      ExplicitHeight = 303
       object pnlTurn: TPanel
         Left = 0
         Top = 0
@@ -422,7 +425,7 @@ object Main: TMain
         Left = 0
         Top = 30
         Width = 706
-        Height = 263
+        Height = 253
         Align = alClient
         AutoFitColWidths = True
         FilterEditMode = False
@@ -436,6 +439,7 @@ object Main: TMain
         FooterFont.Name = 'Tahoma'
         FooterFont.Style = []
         OptionsEh = [dghFixed3D, dghHighlightFocus, dghClearSelection, dghDialogFind, dghColumnResize, dghColumnMove, dghExtendVertLines, dghHideFilterDoApply, dghHighlightNull]
+        ReadOnly = True
         RowDetailPanel.Color = clBtnFace
         TabOrder = 1
         TitleFont.Charset = DEFAULT_CHARSET
@@ -489,22 +493,25 @@ object Main: TMain
       end
       object sbTurn: TStatusBar
         Left = 0
-        Top = 293
+        Top = 283
         Width = 706
         Height = 19
         Panels = <
           item
+            Alignment = taCenter
+            Text = '0:0'
             Width = 100
           end
           item
             Width = 50
           end>
+        ExplicitTop = 284
       end
     end
     object tsList: TTabSheet
       Caption = #1057#1087#1080#1089#1086#1082
       ImageIndex = 2
-      ExplicitHeight = 272
+      ExplicitHeight = 312
       object pnlEva: TPanel
         Left = 0
         Top = 0
@@ -572,7 +579,7 @@ object Main: TMain
         Left = 0
         Top = 30
         Width = 706
-        Height = 263
+        Height = 253
         Align = alClient
         AutoFitColWidths = True
         FilterEditMode = False
@@ -586,6 +593,7 @@ object Main: TMain
         FooterFont.Name = 'Tahoma'
         FooterFont.Style = []
         OptionsEh = [dghFixed3D, dghHighlightFocus, dghClearSelection, dghDialogFind, dghColumnResize, dghColumnMove, dghExtendVertLines, dghHideFilterDoApply, dghHighlightNull]
+        ReadOnly = True
         RowDetailPanel.Color = clBtnFace
         TabOrder = 1
         TitleFont.Charset = DEFAULT_CHARSET
@@ -641,16 +649,19 @@ object Main: TMain
       end
       object sbEva: TStatusBar
         Left = 0
-        Top = 293
+        Top = 283
         Width = 706
         Height = 19
         Panels = <
           item
+            Alignment = taCenter
+            Text = '0:0'
             Width = 100
           end
           item
             Width = 50
           end>
+        ExplicitTop = 293
       end
     end
   end
@@ -737,6 +748,7 @@ object Main: TMain
   object qReg: TADOQuery
     Connection = MSBase
     CursorType = ctStatic
+    AfterScroll = qRegAfterScroll
     Parameters = <>
     SQL.Strings = (
       'DECLARE @DD1 as DATE, @DD2 as DATE'
@@ -757,6 +769,7 @@ object Main: TMain
       'JOIN DicOrganization DOR on DOR.ORGANIZATION_ID = EXR.BuroId'
       ''
       'WHERE CAST (EXR.AppointmentDT as date) = @DD1'
+      'ORDER BY EXR.AppointmentDT'
       ';')
     Left = 448
     Top = 8

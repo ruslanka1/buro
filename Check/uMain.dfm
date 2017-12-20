@@ -2,10 +2,10 @@ object Main: TMain
   Left = 2186
   Top = 576
   Caption = #1055#1088#1086#1087#1091#1089#1082#1085#1086#1081' '#1087#1091#1085#1082#1090
-  ClientHeight = 291
+  ClientHeight = 321
   ClientWidth = 714
   Color = clBtnFace
-  Constraints.MinHeight = 330
+  Constraints.MinHeight = 360
   Constraints.MinWidth = 730
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -70,14 +70,15 @@ object Main: TMain
     Left = 0
     Top = 41
     Width = 714
-    Height = 250
+    Height = 280
     Align = alClient
     TabOrder = 1
+    ExplicitHeight = 250
     object imgPerson: TImage
       Left = 1
       Top = 1
       Width = 147
-      Height = 248
+      Height = 278
       Align = alClient
       Picture.Data = {
         0A544A504547496D61676513190000FFD8FFE000104A46494600010101006000
@@ -293,9 +294,10 @@ object Main: TMain
       Left = 148
       Top = 1
       Width = 565
-      Height = 248
+      Height = 278
       Align = alRight
       TabOrder = 0
+      ExplicitHeight = 248
       object lblLNAME: TLabel
         Left = 51
         Top = 47
@@ -385,7 +387,7 @@ object Main: TMain
         Caption = #1042#1086#1079#1088#1072#1089#1090
       end
       object lblROOM: TLabel
-        Left = 246
+        Left = 261
         Top = 182
         Width = 43
         Height = 13
@@ -423,6 +425,14 @@ object Main: TMain
         Height = 13
         Alignment = taRightJustify
         Caption = #1062#1077#1083#1100' '#1074#1080#1079#1080#1090#1072
+      end
+      object lblEvaOrg: TLabel
+        Left = 59
+        Top = 237
+        Width = 36
+        Height = 13
+        Alignment = taRightJustify
+        Caption = #1057#1086#1089#1090#1072#1074
       end
       object edLNAME: TEdit
         Left = 101
@@ -483,7 +493,7 @@ object Main: TMain
       object edMAIL: TEdit
         Left = 101
         Top = 179
-        Width = 130
+        Width = 151
         Height = 21
         ReadOnly = True
         TabOrder = 11
@@ -519,7 +529,7 @@ object Main: TMain
         Visible = True
       end
       object edROOM: TEdit
-        Left = 295
+        Left = 310
         Top = 179
         Width = 45
         Height = 21
@@ -557,6 +567,14 @@ object Main: TMain
         Height = 21
         ReadOnly = True
         TabOrder = 15
+      end
+      object mmOrg: TMemo
+        Left = 101
+        Top = 234
+        Width = 420
+        Height = 32
+        ReadOnly = True
+        TabOrder = 16
       end
     end
   end

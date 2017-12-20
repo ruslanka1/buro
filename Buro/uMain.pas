@@ -110,6 +110,7 @@ type
     procedure btnTurnRefreshClick(Sender: TObject);
     procedure btnEvaRefreshClick(Sender: TObject);
     procedure grdEvaDblClick(Sender: TObject);
+    procedure qRegAfterScroll(DataSet: TDataSet);
   private
     { Private declarations }
     f_ticket: integer;
@@ -402,6 +403,7 @@ begin
   begin
     stStatus.Caption:= 'Идёт сканирование...';
     Screen.Cursor:= crHourGlass;
+    Application.ProcessMessages;
     try
       repeat
         Sleep (100);
@@ -411,6 +413,7 @@ begin
          or  Application.Terminated
       ;
       stStatus.Caption:= 'Сканирование закончено.';
+      Application.ProcessMessages;
     finally
       Screen.Cursor:= crDefault;
     end;
@@ -477,6 +480,11 @@ begin
   sbTurn.Panels[0].Text:= Format('%d : %d', [DataSet.RecNo, DataSet.RecordCount]);
 end;
 
+procedure TMain.qRegAfterScroll(DataSet: TDataSet);
+begin
+  sbEva.Panels[0].Text:= Format('%d : %d', [DataSet.RecNo, DataSet.RecordCount]);
+end;
+
 procedure TMain.save_eva(dt: TDateTime);
 begin
   if not DirectoryExists(FEVA) then
@@ -492,7 +500,7 @@ begin
   try
     CrtXML(dt);
   finally
-    stStatus.Caption:= 'Готово!';
+    stStatus.Caption:= 'В ЕАВИИАС направлено!';
     Application.ProcessMessages;
     sleep(1000);
     stStatus.Caption:= '';
@@ -530,11 +538,13 @@ var
   end;
 
   procedure XmlBoby;
+  var id: string;
   begin
+    id:= StringReplace(StringReplace(GUIDToString(MyGuid),'{','',[]),'}','',[]);
     fXML.Add('  <Person>');
     try
       fXML.Add('    <DT>'+sxml(FormatDateTime('yyyy-mm-dd hh:mm:ss',dt))+'</DT>');
-      fXML.Add('    <ID>'+sxml(s)+'</ID>');
+      fXML.Add('    <ID>'+sxml(id)+'</ID>');
       fXML.Add('    <EVAID>'+sxml(edEvaID.Text)+'</EVAID>');
       fXML.Add('    <NUM>'+sxml(Format('%.3d', [f_ticket]))+'</NUM>');
       fXML.Add('    <LNAME>'+sxml(edLNAME.Text)+'</LNAME>');
@@ -549,7 +559,7 @@ var
 begin
   if (CreateGUID(MyGUID) = 0) then
   begin
-    s:= StringReplace(StringReplace(GUIDToString(MyGuid),'{','',[]),'}','',[]);
+    s:= FormatDateTime('yyyy_mm_dd-', date)+Format('%.3d', [f_ticket]);
     fXML:= TStringList.Create;
     try
       XmlHeader;
@@ -645,6 +655,7 @@ begin
       end;
     end;
   finally
+    mt.Last;
     mt.EnableControls;
   end;
 end;
