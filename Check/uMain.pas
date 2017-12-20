@@ -13,7 +13,6 @@ type
     btnScan: TButton;
     edCode: TDBNumberEditEh;
     pnlDetails: TPanel;
-    stStatus: TStaticText;
     imgPerson: TImage;
     pnlPerson: TPanel;
     lblLNAME: TLabel;
@@ -48,6 +47,7 @@ type
     edDOCNUM: TEdit;
     lblGOAL: TLabel;
     edGOAL: TEdit;
+    stStatus: TPanel;
     procedure btnScanClick(Sender: TObject);
     procedure edCodeKeyPress(Sender: TObject; var Key: Char);
     procedure FormShow(Sender: TObject);
@@ -73,7 +73,7 @@ const
 
 implementation
 
-uses System.IniFiles, System.Win.Registry;
+uses System.IniFiles, System.Win.Registry, System.StrUtils, System.DateUtils;
 
 {$R *.dfm}
 
@@ -106,12 +106,14 @@ procedure TMain.run;
 var
   s, c_dir, s_ticket: string;
   Ini: Tinifile;
+  //dt: TDateTime;
 begin
   clear;
   if not DirectoryExists(FDIR) then
   begin
-    s:= 'Папка ' + FDIR + ' не существует...';
-    Application.MessageBox(PChar(s), PChar('Внимание'));
+    stStatus.Caption:=  'Нет подключения к хранилищу !';
+    stStatus.Color:= clFuchsia;
+    Application.ProcessMessages;
     exit;
   end;
 
@@ -119,16 +121,23 @@ begin
   if not DirectoryExists(c_dir) then
   begin
     stStatus.Caption:=  'Сегодня нет зарегистрированных посетителей !';
+    stStatus.Color:= clBtnFace;
+    Application.ProcessMessages;
+    sleep(3000);
+    edCode.Text:= '';
     exit;
   end;
 
-  s_ticket:=get_barcode(edCode.Text);
+  s:= get_barcode(edCode.Text);
+  s_ticket:= RightStr(s, 3);
   c_dir:= c_dir+'\'+s_ticket;
-  if not DirectoryExists(c_dir) then
+  if (DayOfTheYear(date) <> StrToIntDef(LeftStr(s, 3), 0)) or not DirectoryExists(c_dir) then
   begin
-    stStatus.Caption:=  'Посетитель с талоном ' + s_ticket + ' не зарегистрирован!';
+    stStatus.Caption:=  'Посетитель с талоном ' + s + ' сегодня не зарегистрирован !';
     stStatus.Color:= clRed;
     Application.ProcessMessages;
+    sleep(3000);
+    edCode.Text:= '';
     exit;
   end;
 
@@ -154,10 +163,10 @@ begin
     imgPerson.Show;
   finally
     Ini.Free;
-    stStatus.Caption:=  'Посетитель с талоном ' + s_ticket + ' зарегистрирован!';
+    stStatus.Caption:=  'Посетитель с талоном ' + s + ' зарегистрирован!';
     stStatus.Color:= clLime;
     Application.ProcessMessages;
-    sleep(1000);
+    sleep(3000);
     edCode.Text:= '';
   end;
 end;
@@ -169,6 +178,7 @@ begin
   Reg:= TRegIniFile.Create('Software');
   try
     Reg.OpenKey(ExtractFileName(ParamStr(0)), true);
+    Reg.WriteInteger(Name, 'Max',    ord(Main.WindowState = wsMaximized));
     Reg.WriteInteger(Name, 'Left',   Main.Left);
     Reg.WriteInteger(Name, 'Top',    Main.Top);
     Reg.WriteInteger(Name, 'Height', Main.Height);
@@ -184,11 +194,17 @@ end;
 procedure TMain.LoadDir;
 var
   Reg: TRegIniFile;
+  w_max: integer;
 begin
   // Считываем пути из реестра
   Reg:= TRegIniFile.Create('Software');
   try
     Reg.OpenKey(ExtractFileName(ParamStr(0)), true);
+    w_max:=        Reg.ReadInteger(Name, 'Max',    0);
+    if w_max = 1 then
+      Main.WindowState:= wsMaximized
+    else
+      Main.WindowState:= wsNormal;
     Main.Left:=    Reg.ReadInteger(Name, 'Left',   Main.Left);
     Main.Top:=     Reg.ReadInteger(Name, 'Top',    Main.Top);
     Main.Height:=  Reg.ReadInteger(Name, 'Height', Main.Height);
