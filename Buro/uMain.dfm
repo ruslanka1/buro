@@ -77,7 +77,7 @@ object Main: TMain
     Top = 41
     Width = 714
     Height = 330
-    ActivePage = tsTurn
+    ActivePage = tsPerson
     Align = alClient
     TabOrder = 1
     ExplicitHeight = 300
@@ -252,6 +252,14 @@ object Main: TMain
           Alignment = taRightJustify
           Caption = #1057#1086#1089#1090#1072#1074
         end
+        object lblTime: TLabel
+          Left = 360
+          Top = 236
+          Width = 30
+          Height = 13
+          Alignment = taRightJustify
+          Caption = #1042#1088#1077#1084#1103
+        end
         object edLNAME: TEdit
           Left = 101
           Top = 44
@@ -376,7 +384,7 @@ object Main: TMain
         object edEvaID: TEdit
           Left = 101
           Top = 233
-          Width = 340
+          Width = 253
           Height = 21
           ReadOnly = True
           TabOrder = 16
@@ -397,11 +405,24 @@ object Main: TMain
           Height = 32
           TabOrder = 18
         end
+        object edTime: TEdit
+          Left = 396
+          Top = 233
+          Width = 45
+          Height = 21
+          Alignment = taCenter
+          ReadOnly = True
+          TabOrder = 19
+        end
       end
     end
     object tsTurn: TTabSheet
       Caption = #1054#1095#1077#1088#1077#1076#1100
       ImageIndex = 1
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object pnlTurn: TPanel
         Left = 0
         Top = 0
@@ -517,6 +538,10 @@ object Main: TMain
     object tsList: TTabSheet
       Caption = #1057#1087#1080#1089#1086#1082
       ImageIndex = 2
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object pnlEva: TPanel
         Left = 0
         Top = 0

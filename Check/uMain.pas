@@ -162,6 +162,7 @@ begin
     edOLD.Text:= Ini.ReadString('Person','old','');
     edGOAL.Text:= Ini.ReadString('Person','goal','');
     mmORG.Text:= Ini.ReadString('Person','evaorg','');
+    lblEvaOrg.Caption:= Ini.ReadString('Person','evatime','');
     imgPerson.Picture.LoadFromFile(c_dir+'\'+FIMG);
     imgPerson.Show;
   finally
@@ -236,6 +237,9 @@ begin
   edOLD.Text:= '';
   edROOM.Text:= '';
   edTicket.Text:='';
+  edGOAL.Text:='';
+  lblEvaOrg.Caption:='';
+  mmOrg.Lines.Text:='';
   imgPerson.Hide;
 end;
 

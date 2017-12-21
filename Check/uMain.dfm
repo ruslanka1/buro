@@ -392,7 +392,7 @@ object Main: TMain
         Width = 43
         Height = 13
         Alignment = taRightJustify
-        Caption = #1050#1086#1084#1085#1072#1090#1072
+        Caption = #1050#1072#1073#1080#1085#1077#1090
       end
       object lblTicket: TLabel
         Left = 360
@@ -427,12 +427,18 @@ object Main: TMain
         Caption = #1062#1077#1083#1100' '#1074#1080#1079#1080#1090#1072
       end
       object lblEvaOrg: TLabel
-        Left = 59
+        Left = 37
         Top = 237
-        Width = 36
-        Height = 13
+        Width = 58
+        Height = 19
         Alignment = taRightJustify
         Caption = #1057#1086#1089#1090#1072#1074
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -16
+        Font.Name = 'Tahoma'
+        Font.Style = [fsBold]
+        ParentFont = False
       end
       object edLNAME: TEdit
         Left = 101

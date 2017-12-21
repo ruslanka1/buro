@@ -100,6 +100,8 @@ type
     lblEvaOrg: TLabel;
     mmOrg: TMemo;
     mtBDATE: TStringField;
+    lblTime: TLabel;
+    edTime: TEdit;
     procedure btnNewClick(Sender: TObject);
     procedure btnScanClick(Sender: TObject);
     procedure btnPrintClick(Sender: TObject);
@@ -115,8 +117,9 @@ type
   private
     { Private declarations }
     f_ticket: integer;
-    app_dir: string;
-    f_save: boolean;
+    app_dir,
+    cur_dir,
+    prs_dir: string;
     procedure scan;
     procedure save;
     procedure clear;
@@ -132,6 +135,7 @@ type
     procedure turn_write(lst: TStringList);  // Записать очередь
     procedure GetConLst;
     procedure GetAllFiles(Path: string; Lb: TStringList; All: boolean=False);
+    function get_ticket: integer;
   public
     { Public declarations }
   end;
@@ -209,11 +213,16 @@ begin
   edROOM.Text:= '';
   edGOAL.Text:= '';
   edEvaID.Text:= '';
+  edTime.Text:= '';
   mmOrg.Lines.Text:= '';
-
-  if f_save then
-    inc(f_ticket);
-  f_save:= false;
+{
+  if f_date < date then
+  begin
+    f_date:= date;
+    f_ticket:=0;
+  end;
+}
+  f_ticket:= get_ticket;
   edTicket.Text:=IntToStr(f_ticket);
   imgPerson.Hide;
 end;
@@ -225,6 +234,7 @@ end;
 
 procedure TMain.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
+  clear;
   SaveDir;
 end;
 
@@ -237,6 +247,7 @@ begin
   dir:= app_dir+'\About.jpg';
   imgPerson.Picture.LoadFromFile(dir);
   imgPerson.Show;
+  clear;
   pcPGS.ActivePage:= tsPerson;
 end;
 
@@ -251,20 +262,22 @@ procedure TMain.init_ticket;
 begin
   Ticket.mmOrg.Lines.Text:= trim(mmOrg.Lines.Text);
   Ticket.lblDate.Caption := FormatDateTime('dd.mm.yyyy', date);
-  Ticket.lblRoom.Caption:= 'Кабинет № ' + edROOM.Text;
+  Ticket.lblTime.Caption := trim(edTime.Text);
+  Ticket.lblRoom.Caption:= 'Кабинет ' + edROOM.Text;
   Ticket.lblNumber.Caption:= set_barcode(edTicket.Text);
   Ticket.lblBarcode.Caption:= Ticket.lblNumber.Caption;
-  Ticket.fdir:= FDIR+'\'+FormatDateTime('yyyy-mm-dd', now)+'\'+Format('%.3d', [f_ticket]);
+  Ticket.fdir:= prs_dir;
   Ticket.femail:= trim(edMAIL.Text);
   Ticket.ShowModal;
 end;
 
 procedure TMain.save;
 var
-  c_dir: string;
+  //c_dir: string;
   Ini: Tinifile;
   cdt: TDateTime;
 begin
+{
   if not DirectoryExists(FDIR) then
   begin
     stStatus.Caption:=  'Нет подключения к хранилищу !';
@@ -290,9 +303,9 @@ begin
     Application.ProcessMessages;
     exit;
   end;
-
+}
   cdt:= now;
-  Ini:=TiniFile.Create(c_dir+'\'+FINI);
+  Ini:=TiniFile.Create(prs_dir+'\'+FINI);
   try
     Ini.WriteDateTime('Person','dtcreat',cdt);
     Ini.WriteString('Person','docser',edDOCSER.Text);
@@ -314,11 +327,11 @@ begin
     Ini.WriteString('Person','old',edOLD.Text);
     Ini.WriteString('Person','goal',edGOAL.Text);
     Ini.WriteString('Person','evaid',edEvaID.Text);
+    Ini.WriteString('Person','evatime',edTime.Text);
     Ini.WriteString('Person','evaorg',mmOrg.Lines.Text);
-    imgPerson.Picture.SaveToFile(c_dir+'\'+FIMG);
+    imgPerson.Picture.SaveToFile(prs_dir+'\'+FIMG);
     save_eva(cdt);
   finally
-    f_save:= True;
     Ini.Free;
   end;
 end;
@@ -433,9 +446,8 @@ begin
     Reg.WriteInteger(Name, 'Top',    Main.Top);
     Reg.WriteInteger(Name, 'Height', Main.Height);
     Reg.WriteInteger(Name, 'Width',  Main.Width);
-    Reg.WriteInteger(Name, 'ticket', f_ticket);
-    Reg.WriteString (Name, 'sdate', DateToStr(date));
-    Reg.WriteBool   (Name, 'save',   f_save);
+    //Reg.WriteInteger(Name, 'ticket', f_ticket);
+    //Reg.WriteString (Name, 'sdate', DateToStr(date));
     Reg.WriteString (Name, 'eva_bd', Trim(edEvaBD.Text));
     Reg.WriteString (Name, 'eva_ip', Trim(edEvaIP.Text));
     Reg.WriteString (Name, 'eva_pt', Trim(edEvaPort.Text));
@@ -447,7 +459,6 @@ end;
 procedure TMain.LoadDir;
 var
   Reg: TRegIniFile;
-  cdate: TDateTime;
   w_max: integer;
 begin
   // Считываем пути из реестра
@@ -466,11 +477,12 @@ begin
     edEvaBD.Text:=  Reg.ReadString(Name, 'eva_bd', '');
     edEvaIP.Text:=  Reg.ReadString(Name, 'eva_ip', '');
     edEvaPort.Text:=Reg.ReadString(Name, 'eva_pt', '');
-    f_save:=        Reg.ReadBool   (Name, 'save',   True);
+{
     f_ticket:=      Reg.ReadInteger(Name, 'ticket', 0);
     cdate:=         StrToDate(Reg.ReadString (Name, 'sdate', '01.01.1900'));
     if cdate < date then
-       f_ticket:=0;
+      f_ticket:=0;
+}
   finally
     Reg.Free;
   end;
@@ -581,6 +593,7 @@ begin
   if not qReg.IsEmpty then
   begin
     edEvaID.Text:= qRegGUID.AsString;
+    edTime.Text:= FormatDateTime('hh:nn', qRegDT_MSE.AsDateTime);
     mmOrg.Lines.Text:= qRegORG.AsString;
     edROOM.Text:=  qRegROOM.AsString;
     pcPGS.ActivePage:= tsPerson;
@@ -589,20 +602,12 @@ end;
 
 procedure TMain.turn_refresh;
 var
-  s: string;
   lst: TStringList;
 begin
   lst:= TStringList.Create;
   try
-    if not DirectoryExists(FDIR) then
-    begin
-      s:= 'Папка источника ' + FDIR + ' не существует...';
-      Application.MessageBox(PChar(s), PChar('Внимание'));
-      exit;
-    end;
-//    s:= '2017-12-15';
-    s:= FormatDateTime('yyyy-mm-dd', date);
-    GetAllFiles(FDIR+'\'+s, lst, True);
+//    prs_dir:= '2017-12-15';
+    GetAllFiles(cur_dir, lst, True);
     turn_write(lst);
   finally
     lst.Free;
@@ -734,6 +739,95 @@ begin
         stStatus.Caption:= 'Ошибка подключения к ЕАВИИАС ( '+E.Message +' )';
     end;
       Application.ProcessMessages;
+  end;
+end;
+
+function TMain.get_ticket: integer;
+var
+  i, j, k: integer;
+  fnl, dnl: TStringList;
+  fbk: string;
+begin
+  Result:= -1;
+  cur_dir:= '';
+  prs_dir:= '';
+  fbk:= '\block';
+  if not DirectoryExists(FDIR) then
+  begin
+    stStatus.Caption:=  'Нет подключения к хранилищу !';
+    stStatus.Color:= clFuchsia;
+    Application.ProcessMessages;
+    exit;
+  end;
+
+  cur_dir:= FDIR+'\'+FormatDateTime('yyyy-mm-dd', date);
+  if (not DirectoryExists(cur_dir)) and (not CreateDir(cur_dir)) then
+  begin
+    stStatus.Caption:=  'Нет возможности начать регистрацию на сегодня !';
+    stStatus.Color:= clFuchsia;
+    Application.ProcessMessages;
+    exit;
+  end;
+
+  i:=0;
+  while FileExists(cur_dir+fbk) and (i < 100) do
+  begin
+    sleep(100);
+    inc(i);
+    Application.ProcessMessages;
+  end;
+
+  if (i = 10) and (not DeleteFile(cur_dir+fbk)) then
+  begin
+    stStatus.Caption:=  'Регистрация на сегодня заблокирована !';
+    stStatus.Color:= clFuchsia;
+    Application.ProcessMessages;
+    exit;
+  end;
+
+  if (not DirectoryExists(cur_dir+fbk)) and (not CreateDir(cur_dir+fbk)) then
+  begin
+    stStatus.Caption:=  'Нет возможности заблокировать папку !';
+    stStatus.Color:= clFuchsia;
+    Application.ProcessMessages;
+    exit;
+  end;
+
+  k:= 0;
+  fnl:= TStringList.Create;
+  dnl:= TStringList.Create;
+  try
+    GetAllFiles(cur_dir, fnl, True);
+    for i := 0 to fnl.Count - 1 do
+    begin
+      dnl.Text:= StringReplace(fnl[i],'\',#13#10,[rfReplaceAll]);
+      j:= StrToIntDef(dnl[dnl.Count-2], 0);
+      if k < j then
+        k:= j;
+    end;
+  finally
+    fnl.Free;
+    dnl.Free;
+    inc(k);
+    prs_dir:= cur_dir+'\'+Format('%.3d', [k]);  //IntToStr(f_ticket);
+    if DirectoryExists(prs_dir) or CreateDir(prs_dir) then
+      Result:= k
+    else
+    begin
+      stStatus.Caption:=  'Нет возможности сохранить регистрацию посетителя !';
+      stStatus.Color:= clFuchsia;
+      Application.ProcessMessages;
+    end;
+    if DirectoryExists(cur_dir+fbk) then
+      RmDir(cur_dir+fbk);
+    Application.ProcessMessages;
+    if DirectoryExists(cur_dir+fbk) then
+    begin
+      stStatus.Caption:=  'Нет возможности снять блокировку папки !';
+      stStatus.Color:= clFuchsia;
+      Application.ProcessMessages;
+      Result:= 0;
+    end;
   end;
 end;
 

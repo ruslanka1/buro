@@ -22,6 +22,7 @@ type
     IdSMTP: TIdSMTP;
     IdMes: TIdMessage;
     IdSSL: TIdSSLIOHandlerSocketOpenSSL;
+    lblTime: TLabel;
     procedure btnPrintClick(Sender: TObject);
     procedure btnSendClick(Sender: TObject);
     procedure btnPrintSendClick(Sender: TObject);
@@ -45,41 +46,62 @@ implementation
 {$R *.dfm}
 
 procedure TTicket.btnPrintClick(Sender: TObject);
+var ht: integer;
 begin
   btnPrint.Hide;
   btnSend.Hide;
   btnPrintSend.Hide;
+  ht:= mmOrg.Height;
   try
+    mmOrg.Height:= btnPrint.Top - mmOrg.Top + btnPrint.Height;
+    Application.ProcessMessages;
     print;
   finally
+    mmOrg.Height:= ht;
     btnPrint.Show;
+    btnSend.Show;
+    btnPrintSend.Show;
 //    Hide;
   end;
 end;
 
 procedure TTicket.btnPrintSendClick(Sender: TObject);
+var ht: integer;
 begin
   btnPrint.Hide;
   btnSend.Hide;
   btnPrintSend.Hide;
+  ht:= mmOrg.Height;
   try
+    mmOrg.Height:= btnPrint.Top - mmOrg.Top + btnPrint.Height;
+    Application.ProcessMessages;
     send;
     print;
   finally
+    mmOrg.Height:= ht;
     btnPrint.Show;
+    btnSend.Show;
+    btnPrintSend.Show;
 //    Hide;
   end;
 end;
 
 procedure TTicket.btnSendClick(Sender: TObject);
+var ht: integer;
 begin
   btnPrint.Hide;
   btnSend.Hide;
   btnPrintSend.Hide;
+  ht:= mmOrg.Height;
   try
+    mmOrg.Height:= btnPrint.Top - mmOrg.Top + btnPrint.Height;
+    Application.ProcessMessages;
     send;
   finally
+    mmOrg.Height:= ht;
     btnPrint.Show;
+    btnSend.Show;
+    btnPrintSend.Show;
 //    Hide;
   end;
 end;

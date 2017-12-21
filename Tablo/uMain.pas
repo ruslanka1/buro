@@ -22,6 +22,7 @@ type
     mtGOAL: TStringField;
     Timer: TTimer;
     mtORG: TStringField;
+    mtTIME: TStringField;
     procedure FormShow(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure mtAfterScroll(DataSet: TDataSet);
@@ -121,6 +122,7 @@ begin
         mtFNMAE.AsString:= Ini.ReadString('Person','fname','');
         mtSNAME.AsString:= Ini.ReadString('Person','sname','');
         mtROOM.AsString:=  Ini.ReadString('Person','room','');
+        mtTIME.AsString:=  Ini.ReadString('Person','evatime','');
         mtORG.AsString:=   Ini.ReadString('Person','evaorg','');
         mtGOAL.AsString:=  Ini.ReadString('Person','goal','');
         mt.Post;

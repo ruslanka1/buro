@@ -68,6 +68,14 @@ object Main: TMain
         Width = 50
       end
       item
+        Alignment = taCenter
+        AutoFitColWidth = False
+        EditButtons = <>
+        FieldName = 'TIME'
+        Footers = <>
+        Width = 40
+      end
+      item
         AutoFitColWidth = False
         EditButtons = <>
         FieldName = 'LNAME'
@@ -134,6 +142,11 @@ object Main: TMain
       DisplayLabel = #1050#1072#1073#1080#1085#1077#1090
       FieldName = 'ROOM'
       Size = 10
+    end
+    object mtTIME: TStringField
+      DisplayLabel = #1042#1088#1077#1084#1103
+      FieldName = 'TIME'
+      Size = 5
     end
     object mtLNAME: TStringField
       DisplayLabel = #1060#1072#1084#1080#1083#1080#1103
