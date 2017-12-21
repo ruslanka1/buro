@@ -1,0 +1,107 @@
+object Main: TMain
+  Left = 1308
+  Height = 320
+  Top = 27
+  Width = 600
+  Caption = 'Очередь'
+  ClientHeight = 320
+  ClientWidth = 600
+  Color = clBtnFace
+  Constraints.MinHeight = 300
+  Constraints.MinWidth = 600
+  Font.Color = clWindowText
+  Font.Height = -11
+  Font.Name = 'Tahoma'
+  OnClose = FormClose
+  OnCreate = FormCreate
+  OnShow = FormShow
+  LCLVersion = '1.6.0.4'
+  object pnlTurn: TPanel
+    Left = 0
+    Height = 25
+    Top = 0
+    Width = 600
+    Align = alTop
+    BevelOuter = bvNone
+    TabOrder = 0
+  end
+  object sbTurn: TStatusBar
+    Left = 0
+    Height = 21
+    Top = 299
+    Width = 600
+    Panels = <    
+      item
+        Text = '  00:00:00'
+        Width = 100
+      end    
+      item
+        Text = '???'
+        Width = 50
+      end>
+    SimplePanel = False
+  end
+  object grData: TDBGrid
+    Left = 0
+    Height = 274
+    Top = 25
+    Width = 600
+    Align = alClient
+    Color = clWindow
+    Columns = <>
+    DataSource = ds
+    TabOrder = 2
+    TitleFont.Color = clWindowText
+    TitleFont.Height = -11
+    TitleFont.Name = 'Tahoma'
+  end
+  object ds: TDataSource
+    DataSet = mt
+    left = 344
+    top = 48
+  end
+  object Timer: TTimer
+    Enabled = False
+    Interval = 15000
+    OnTimer = TimerTimer
+    left = 384
+    top = 48
+  end
+  object mt: TMemDataset
+    Active = True
+    FieldDefs = <    
+      item
+        Name = 'mtNUM'
+        DataType = ftString
+        Size = 6
+      end    
+      item
+        Name = 'mtLNAME'
+        DataType = ftString
+        Size = 30
+      end    
+      item
+        Name = 'mtFNAME'
+        DataType = ftString
+        Size = 22
+      end    
+      item
+        Name = 'mtSNAME'
+        DataType = ftString
+        Size = 22
+      end    
+      item
+        Name = 'mtROOM'
+        DataType = ftString
+        Size = 6
+      end    
+      item
+        Name = 'mtGOAL'
+        DataType = ftString
+        Size = 25
+      end>
+    AfterOpen = mtAfterOpen
+    left = 346
+    top = 105
+  end
+end
