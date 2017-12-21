@@ -1,7 +1,7 @@
 object Main: TMain
-  Left = 1308
+  Left = 1000
   Height = 320
-  Top = 27
+  Top = 30
   Width = 600
   Caption = 'Очередь'
   ClientHeight = 320
