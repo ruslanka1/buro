@@ -113,7 +113,7 @@ begin
   config.Save;
 
   //DEBUG:
-  mt.SaveToFile (config.AppName + '.mds');
+  //mt.SaveToFile (config.AppName + '.mds');
   //
 
   Action := caFree
