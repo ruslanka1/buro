@@ -1,12 +1,7 @@
 unit uMain;
 
-{$IFDEF FPC}
-  {$MODE Delphi}
-{$ENDIF}
-
 interface
 
-{$IFDEF MSWINDOWS}
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.Mask, DBCtrlsEh,
@@ -112,6 +107,9 @@ type
     qRegROOM: TWideStringField;
     lblEvaOrg: TLabel;
     mmOrg: TMemo;
+    mtBDATE: TStringField;
+    lblTime: TLabel;
+    edTime: TEdit;
     procedure btnNewClick(Sender: TObject);
     procedure btnScanClick(Sender: TObject);
     procedure btnPrintClick(Sender: TObject);
@@ -124,11 +122,13 @@ type
     procedure btnTurnRefreshClick(Sender: TObject);
     procedure btnEvaRefreshClick(Sender: TObject);
     procedure grdEvaDblClick(Sender: TObject);
+    procedure qRegAfterScroll(DataSet: TDataSet);
   private
     { Private declarations }
     f_ticket: integer;
-    app_dir: string;
-    f_save: boolean;
+    app_dir,
+    cur_dir,
+    prs_dir: string;
     procedure scan;
     procedure send;
     procedure save;
@@ -145,6 +145,7 @@ type
     procedure turn_write(lst: TStringList);  // Çàïèñàòü î÷åðåäü
     procedure GetConLst;
     procedure GetAllFiles(Path: string; Lb: TStringList; All: boolean=False);
+    function get_ticket: integer;
   public
     { Public declarations }
   end;
@@ -238,11 +239,16 @@ begin
   edROOM.Text:= '';
   edGOAL.Text:= '';
   edEvaID.Text:= '';
+  edTime.Text:= '';
   mmOrg.Lines.Text:= '';
-
-  if f_save then
-    inc(f_ticket);
-  f_save:= false;
+{
+  if f_date < date then
+  begin
+    f_date:= date;
+    f_ticket:=0;
+  end;
+}
+  f_ticket:= get_ticket;
   edTicket.Text:=IntToStr(f_ticket);
   imgPerson.Hide;
 end;
@@ -254,6 +260,7 @@ end;
 
 procedure TMain.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
+  clear;
   SaveDir;
 end;
 
@@ -266,6 +273,7 @@ begin
   dir:= app_dir+'\About.jpg';
   imgPerson.Picture.LoadFromFile(dir);
   imgPerson.Show;
+  clear;
   pcPGS.ActivePage:= tsPerson;
 end;
 
@@ -280,20 +288,22 @@ procedure TMain.init_ticket;
 begin
   Ticket.mmOrg.Lines.Text:= trim(mmOrg.Lines.Text);
   Ticket.lblDate.Caption := FormatDateTime('dd.mm.yyyy', date);
-  Ticket.lblRoom.Caption:= 'Êàáèíåò ¹ ' + edROOM.Text;
+  Ticket.lblTime.Caption := trim(edTime.Text);
+  Ticket.lblRoom.Caption:= 'Êàáèíåò ' + edROOM.Text;
   Ticket.lblNumber.Caption:= set_barcode(edTicket.Text);
   Ticket.lblBarcode.Caption:= Ticket.lblNumber.Caption;
-  Ticket.fdir:= FDIR+'\'+FormatDateTime('yyyy-mm-dd', now)+'\'+Format('%.3d', [f_ticket]);
+  Ticket.fdir:= prs_dir;
   Ticket.femail:= trim(edMAIL.Text);
   Ticket.ShowModal;
 end;
 
 procedure TMain.save;
 var
-  c_dir: string;
+  //c_dir: string;
   Ini: Tinifile;
   cdt: TDateTime;
 begin
+{
   if not DirectoryExists(FDIR) then
   begin
     stStatus.Caption:=  'Íåò ïîäêëþ÷åíèÿ ê õðàíèëèùó !';
@@ -319,9 +329,9 @@ begin
     Application.ProcessMessages;
     exit;
   end;
-
+}
   cdt:= now;
-  Ini:=TiniFile.Create(c_dir+'\'+FINI);
+  Ini:=TiniFile.Create(prs_dir+'\'+FINI);
   try
     Ini.WriteDateTime('Person','dtcreat',cdt);
     Ini.WriteString('Person','docser',edDOCSER.Text);
@@ -343,13 +353,13 @@ begin
     Ini.WriteString('Person','old',edOLD.Text);
     Ini.WriteString('Person','goal',edGOAL.Text);
     Ini.WriteString('Person','evaid',edEvaID.Text);
+    Ini.WriteString('Person','evatime',edTime.Text);
     Ini.WriteString('Person','evaorg',mmOrg.Lines.Text);
-    imgPerson.Picture.SaveToFile(c_dir+'\'+FIMG);
+    imgPerson.Picture.SaveToFile(prs_dir+'\'+FIMG);
     save_eva(cdt);
   finally
     f_save:= True;
     Ini.Free;
-    f_ticket:= f_ticket+1;
   end;
 end;
 
@@ -437,112 +447,22 @@ begin
     nShow := SW_HIDE;
   end;
   if not ShellExecuteEx(@SEInfo) then
-    Exit;
-
+    ShowMessage('Ñêàíèðîâàíèå íå çàïóñòèëîñü...')
   else
   begin
-    repeat
-      Sleep (100);
-      Application.ProcessMessages;
-      GetExitCodeProcess (SEInfo.hProcess, ExitCode);
-    until (ExitCode <> STILL_ACTIVE)
-       or  Application.Terminated
-    ;
-    Result := ExitCode <> STILL_ACTIVE
-  end
-{$ELSE}
-var output : ansistring;
-begin
-  Result := RunCommand ('/bin/bash',['-c', nm], output) ;
-//FIXME: save the output
-//  if Result then
-//     writeln (output);
-{$ENDIF}
-end;
-
-type
-
-Sys = class
-public
-  class function systemName () : String;
-  class function OSVersion  () : String;
-  class function command    (cmd: String; args: array of String) : Boolean;
-  class function execUrl    (url : String) : Boolean;
-end;
-
-class function Sys.systemName () : String;
-begin
-  Result := '?';
-{$IFDEF MSWINDOWS}
-  Result := 'Windows';
-{$ENDIF}
-{$IFDEF LINUX}
-  Result := 'Linux';
-{$ELSE}
-{$IFDEF UNIX}
-  Result := 'Unix';
-{$ENDIF}
-{$ENDIF}
-{$IFDEF OS_X}
-// OS X ?
-  Result := 'Mac';
-{$ENDIF}
-end;
-
-//
-// http://forum.lazarus.freepascal.org/index.php?topic=15390.0
-//
-class function Sys.OSVersion () : String;
- var
-  osErr   : integer;
-  response: longint;
-begin
-  {$IFDEF LCLcarbon}
-  OSVersion := 'Mac OS X 10.';
-  {$ELSE}
-  {$IFDEF Linux}
-  OSVersion := 'Linux Kernel ';
-  {$ELSE}
-  {$IFDEF UNIX}
-  OSVersion := 'Unix ';
-  {$ELSE}
-  {$IFDEF WINDOWS}
-  if WindowsVersion = wv95 then OSVersion := 'Windows 95 '
-   else if WindowsVersion = wvNT4 then OSVersion := 'Windows NT v.4 '
-   else if WindowsVersion = wv98 then OSVersion := 'Windows 98 '
-   else if WindowsVersion = wvMe then OSVersion := 'Windows ME '
-   else if WindowsVersion = wv2000 then OSVersion := 'Windows 2000 '
-   else if WindowsVersion = wvXP then OSVersion := 'Windows XP '
-   else if WindowsVersion = wvServer2003 then OSVersion := 'Windows Server 2003 '
-   else if WindowsVersion = wvVista then OSVersion := 'Windows Vista '
-   else if WindowsVersion = wv7 then OSVersion := 'Windows 7 '
-   else OSVersion:= 'Windows ';
-  {$ENDIF}
-  {$ENDIF}
-  {$ENDIF}
-  {$ENDIF}
-//  Result := OSVersion
-end;
-
-class function Sys.command    (cmd: String; args: array of String) : Boolean;
-begin
-  Result := runAndWait (cmd);
-end;
-
-//
-// https://stackoverflow.com/questions/36822025/execute-url-path-in-external-program-in-haxe
-//
-
-class function Sys.execUrl (url : String) : Boolean;
-var
-   urlOpen: String;
-begin
-    case ( Sys.systemName ()[1] ) of
-      'L': urlOpen := 'xdg-open'; // Linux
-      'U': urlOpen := 'xdg-open'; // Unix
-      'M': urlOpen := 'open'    ; // Max (OS X)
-      'W': urlOpen := 'start'   ; // Windows
-      else urlOpen := 'xdg-open'; // FIXME: just hope it's true...
+    stStatus.Caption:= 'Èäžò ñêàíèðîâàíèå...';
+    Screen.Cursor:= crHourGlass;
+    try
+      repeat
+        Sleep (100);
+        Application.ProcessMessages;
+        GetExitCodeProcess(SEInfo.hProcess, ExitCode);
+      until (ExitCode <> STILL_ACTIVE)
+         or  Application.Terminated
+      ;
+      stStatus.Caption:= 'Ñêàíèðîâàíèå çàêîí÷åíî.';
+    finally
+      Screen.Cursor:= crDefault;
     end;
     Sys.command (urlOpen, [url]);
 end;
@@ -572,8 +492,7 @@ var Reg: TRegIniFile;
   //FIXME: introduce application configuration
 {$ENDIF}
 begin
-{$IFDEF MSWINDOWS}
-  // Сохраняем пути в реестр
+  // Ñîõðàíÿåì ïóòè â ðååñòð
   Reg:= TRegIniFile.Create('Software');
   try
     Reg.OpenKey(ExtractFileName(ParamStr(0)), true);
@@ -582,9 +501,8 @@ begin
     Reg.WriteInteger(Name, 'Top',    Main.Top);
     Reg.WriteInteger(Name, 'Height', Main.Height);
     Reg.WriteInteger(Name, 'Width',  Main.Width);
-    Reg.WriteInteger(Name, 'ticket', f_ticket);
-    Reg.WriteString (Name, 'sdate', DateToStr(date));
-    Reg.WriteBool   (Name, 'save',   f_save);
+    //Reg.WriteInteger(Name, 'ticket', f_ticket);
+    //Reg.WriteString (Name, 'sdate', DateToStr(date));
     Reg.WriteString (Name, 'eva_bd', Trim(edEvaBD.Text));
     Reg.WriteString (Name, 'eva_ip', Trim(edEvaIP.Text));
     Reg.WriteString (Name, 'eva_pt', Trim(edEvaPort.Text));
@@ -622,11 +540,12 @@ begin
     edEvaBD.Text:=  Reg.ReadString(Name, 'eva_bd', '');
     edEvaIP.Text:=  Reg.ReadString(Name, 'eva_ip', '');
     edEvaPort.Text:=Reg.ReadString(Name, 'eva_pt', '');
-    f_save:=        Reg.ReadBool   (Name, 'save',   True);
+{
     f_ticket:=      Reg.ReadInteger(Name, 'ticket', 0);
     cdate:=         StrToDate(Reg.ReadString (Name, 'sdate', '01.01.1900'));
     if cdate < date then
-       f_ticket:=0;
+      f_ticket:=0;
+}
   finally
     inc(f_ticket);
     Reg.Free;
@@ -639,6 +558,11 @@ end;
 procedure TMain.mtAfterScroll(DataSet: TDataSet);
 begin
   sbTurn.Panels[0].Text:= Format('%d : %d', [DataSet.RecNo, DataSet.RecordCount]);
+end;
+
+procedure TMain.qRegAfterScroll(DataSet: TDataSet);
+begin
+  sbEva.Panels[0].Text:= Format('%d : %d', [DataSet.RecNo, DataSet.RecordCount]);
 end;
 
 procedure TMain.save_eva(dt: TDateTime);
@@ -656,7 +580,7 @@ begin
   try
     CrtXML(dt);
   finally
-    stStatus.Caption:= 'Ãîòîâî!';
+    stStatus.Caption:= 'Â ÅÀÂÈÈÀÑ íàïðàâëåíî!';
     Application.ProcessMessages;
     sleep(1000);
     stStatus.Caption:= '';
@@ -694,11 +618,13 @@ var
   end;
 
   procedure XmlBoby;
+  var id: string;
   begin
+    id:= StringReplace(StringReplace(GUIDToString(MyGuid),'{','',[]),'}','',[]);
     fXML.Add('  <Person>');
     try
       fXML.Add('    <DT>'+sxml(FormatDateTime('yyyy-mm-dd hh:mm:ss',dt))+'</DT>');
-      fXML.Add('    <ID>'+sxml(s)+'</ID>');
+      fXML.Add('    <ID>'+sxml(id)+'</ID>');
       fXML.Add('    <EVAID>'+sxml(edEvaID.Text)+'</EVAID>');
       fXML.Add('    <NUM>'+sxml(Format('%.3d', [f_ticket]))+'</NUM>');
       fXML.Add('    <LNAME>'+sxml(edLNAME.Text)+'</LNAME>');
@@ -713,7 +639,7 @@ var
 begin
   if (CreateGUID(MyGUID) = 0) then
   begin
-    s:= StringReplace(StringReplace(GUIDToString(MyGuid),'{','',[]),'}','',[]);
+    s:= FormatDateTime('yyyy_mm_dd-', date)+Format('%.3d', [f_ticket]);
     fXML:= TStringList.Create;
     try
       XmlHeader;
@@ -734,6 +660,7 @@ begin
   if not qReg.IsEmpty then
   begin
     edEvaID.Text:= qRegGUID.AsString;
+    edTime.Text:= FormatDateTime('hh:nn', qRegDT_MSE.AsDateTime);
     mmOrg.Lines.Text:= qRegORG.AsString;
     edROOM.Text:=  qRegROOM.AsString;
     pcPGS.ActivePage:= tsPerson;
@@ -747,15 +674,8 @@ var
 begin
   lst:= TStringList.Create;
   try
-    if not DirectoryExists(FDIR) then
-    begin
-      s:= 'Ïàïêà èñòî÷íèêà ' + FDIR + ' íå ñóùåñòâóåò...';
-      Application.MessageBox(PChar(s), PChar('Âíèìàíèå'));
-      exit;
-    end;
-//    s:= '2017-12-15';
-    s:= FormatDateTime('yyyy-mm-dd', date);
-    GetAllFiles(FDIR+'\'+s, lst, True);
+//    prs_dir:= '2017-12-15';
+    GetAllFiles(cur_dir, lst, True);
     turn_write(lst);
   finally
     lst.Free;
@@ -763,6 +683,12 @@ begin
 end;
 
 procedure TMain.turn_write(lst: TStringList);
+  function set_code(s_num: string): string;
+  var dt_num: string;
+  begin
+    dt_num:= IntToStr(DayOfTheYear(date));
+    Result:= RightStr('000'+dt_num, 3)+RightStr('000'+s_num, 3);
+  end;
 var
   i: integer;
   Ini: Tinifile;
@@ -779,10 +705,11 @@ begin
       Ini:=TiniFile.Create(lst[i]);
       try
         mt.Append;
-        mtNUM.AsString:=   st[st.Count-2];
+        mtNUM.AsString:=   set_code(Ini.ReadString('Person','ticket',''));
         mtLNAME.AsString:= Ini.ReadString('Person','lname','');
         mtFNMAE.AsString:= Ini.ReadString('Person','fname','');
         mtSNAME.AsString:= Ini.ReadString('Person','sname','');
+        mtBDATE.AsString:= Ini.ReadString('Person','bdate','');
         mtROOM.AsString:=  Ini.ReadString('Person','room','');
         mtGOAL.AsString:=  Ini.ReadString('Person','goal','');
         mt.Post;
@@ -803,12 +730,15 @@ begin
         Ini.ReadString('Person','ticket','');
         Ini.ReadString('Person','old','');
         Ini.ReadString('Person','goal','');
+        Ini.ReadString('Person','evaid','');
+        Ini.ReadString('Person','evaorg','');
 }
       finally
         Ini.Free;
       end;
     end;
   finally
+    mt.Last;
     mt.EnableControls;
   end;
 end;
@@ -880,6 +810,95 @@ begin
         stStatus.Caption:= 'Îøèáêà ïîäêëþ÷åíèÿ ê ÅÀÂÈÈÀÑ ( '+E.Message +' )';
     end;
       Application.ProcessMessages;
+  end;
+end;
+
+function TMain.get_ticket: integer;
+var
+  i, j, k: integer;
+  fnl, dnl: TStringList;
+  fbk: string;
+begin
+  Result:= -1;
+  cur_dir:= '';
+  prs_dir:= '';
+  fbk:= '\block';
+  if not DirectoryExists(FDIR) then
+  begin
+    stStatus.Caption:=  'Íåò ïîäêëþ÷åíèÿ ê õðàíèëèùó !';
+    stStatus.Color:= clFuchsia;
+    Application.ProcessMessages;
+    exit;
+  end;
+
+  cur_dir:= FDIR+'\'+FormatDateTime('yyyy-mm-dd', date);
+  if (not DirectoryExists(cur_dir)) and (not CreateDir(cur_dir)) then
+  begin
+    stStatus.Caption:=  'Íåò âîçìîæíîñòè íà÷àòü ðåãèñòðàöèþ íà ñåãîäíÿ !';
+    stStatus.Color:= clFuchsia;
+    Application.ProcessMessages;
+    exit;
+  end;
+
+  i:=0;
+  while FileExists(cur_dir+fbk) and (i < 100) do
+  begin
+    sleep(100);
+    inc(i);
+    Application.ProcessMessages;
+  end;
+
+  if (i = 10) and (not DeleteFile(cur_dir+fbk)) then
+  begin
+    stStatus.Caption:=  'Ðåãèñòðàöèÿ íà ñåãîäíÿ çàáëîêèðîâàíà !';
+    stStatus.Color:= clFuchsia;
+    Application.ProcessMessages;
+    exit;
+  end;
+
+  if (not DirectoryExists(cur_dir+fbk)) and (not CreateDir(cur_dir+fbk)) then
+  begin
+    stStatus.Caption:=  'Íåò âîçìîæíîñòè çàáëîêèðîâàòü ïàïêó !';
+    stStatus.Color:= clFuchsia;
+    Application.ProcessMessages;
+    exit;
+  end;
+
+  k:= 0;
+  fnl:= TStringList.Create;
+  dnl:= TStringList.Create;
+  try
+    GetAllFiles(cur_dir, fnl, True);
+    for i := 0 to fnl.Count - 1 do
+    begin
+      dnl.Text:= StringReplace(fnl[i],'\',#13#10,[rfReplaceAll]);
+      j:= StrToIntDef(dnl[dnl.Count-2], 0);
+      if k < j then
+        k:= j;
+    end;
+  finally
+    fnl.Free;
+    dnl.Free;
+    inc(k);
+    prs_dir:= cur_dir+'\'+Format('%.3d', [k]);  //IntToStr(f_ticket);
+    if DirectoryExists(prs_dir) or CreateDir(prs_dir) then
+      Result:= k
+    else
+    begin
+      stStatus.Caption:=  'Íåò âîçìîæíîñòè ñîõðàíèòü ðåãèñòðàöèþ ïîñåòèòåëÿ !';
+      stStatus.Color:= clFuchsia;
+      Application.ProcessMessages;
+    end;
+    if DirectoryExists(cur_dir+fbk) then
+      RmDir(cur_dir+fbk);
+    Application.ProcessMessages;
+    if DirectoryExists(cur_dir+fbk) then
+    begin
+      stStatus.Caption:=  'Íåò âîçìîæíîñòè ñíÿòü áëîêèðîâêó ïàïêè !';
+      stStatus.Color:= clFuchsia;
+      Application.ProcessMessages;
+      Result:= 0;
+    end;
   end;
 end;
 

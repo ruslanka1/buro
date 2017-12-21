@@ -1,11 +1,11 @@
 object Main: TMain
-  Left = 2184
-  Top = 166
+  Left = 2181
+  Top = 146
   Caption = #1056#1077#1075#1080#1089#1090#1088#1072#1094#1080#1103' '#1087#1086#1089#1077#1090#1080#1090#1077#1083#1103
-  ClientHeight = 381
+  ClientHeight = 371
   ClientWidth = 714
   Color = clBtnFace
-  Constraints.MinHeight = 380
+  Constraints.MinHeight = 410
   Constraints.MinWidth = 730
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -85,19 +85,22 @@ object Main: TMain
     Left = 0
     Top = 41
     Width = 714
-    Height = 340
+    Height = 330
     ActivePage = tsPerson
     Align = alClient
     TabOrder = 1
     ExplicitHeight = 300
     object tsPerson: TTabSheet
       Caption = #1055#1086#1089#1077#1090#1080#1090#1077#1083#1100
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
       ExplicitHeight = 272
       object imgPerson: TImage
         Left = 0
         Top = 0
         Width = 141
-        Height = 312
+        Height = 302
         Align = alClient
         Proportional = True
         Stretch = True
@@ -110,7 +113,7 @@ object Main: TMain
         Left = 141
         Top = 0
         Width = 565
-        Height = 312
+        Height = 302
         Align = alRight
         TabOrder = 0
         ExplicitHeight = 272
@@ -258,6 +261,14 @@ object Main: TMain
           Alignment = taRightJustify
           Caption = #1057#1086#1089#1090#1072#1074
         end
+        object lblTime: TLabel
+          Left = 360
+          Top = 236
+          Width = 30
+          Height = 13
+          Alignment = taRightJustify
+          Caption = #1042#1088#1077#1084#1103
+        end
         object edLNAME: TEdit
           Left = 101
           Top = 44
@@ -382,7 +393,7 @@ object Main: TMain
         object edEvaID: TEdit
           Left = 101
           Top = 233
-          Width = 340
+          Width = 253
           Height = 21
           ReadOnly = True
           TabOrder = 16
@@ -403,12 +414,24 @@ object Main: TMain
           Height = 32
           TabOrder = 18
         end
+        object edTime: TEdit
+          Left = 396
+          Top = 233
+          Width = 45
+          Height = 21
+          Alignment = taCenter
+          ReadOnly = True
+          TabOrder = 19
+        end
       end
     end
     object tsTurn: TTabSheet
       Caption = #1054#1095#1077#1088#1077#1076#1100
       ImageIndex = 1
-      ExplicitHeight = 272
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object pnlTurn: TPanel
         Left = 0
         Top = 0
@@ -431,7 +454,7 @@ object Main: TMain
         Left = 0
         Top = 30
         Width = 706
-        Height = 263
+        Height = 253
         Align = alClient
         AutoFitColWidths = True
         FilterEditMode = False
@@ -445,6 +468,7 @@ object Main: TMain
         FooterFont.Name = 'Tahoma'
         FooterFont.Style = []
         OptionsEh = [dghFixed3D, dghHighlightFocus, dghClearSelection, dghDialogFind, dghColumnResize, dghColumnMove, dghExtendVertLines, dghHideFilterDoApply, dghHighlightNull]
+        ReadOnly = True
         RowDetailPanel.Color = clBtnFace
         TabOrder = 1
         TitleFont.Charset = DEFAULT_CHARSET
@@ -489,6 +513,14 @@ object Main: TMain
             Width = 100
           end
           item
+            Alignment = taCenter
+            AutoFitColWidth = False
+            EditButtons = <>
+            FieldName = 'BDATE'
+            Footers = <>
+            Width = 80
+          end
+          item
             EditButtons = <>
             FieldName = 'GOAL'
             Footers = <>
@@ -498,11 +530,13 @@ object Main: TMain
       end
       object sbTurn: TStatusBar
         Left = 0
-        Top = 293
+        Top = 283
         Width = 706
         Height = 19
         Panels = <
           item
+            Alignment = taCenter
+            Text = '0:0'
             Width = 100
           end
           item
@@ -513,7 +547,10 @@ object Main: TMain
     object tsList: TTabSheet
       Caption = #1057#1087#1080#1089#1086#1082
       ImageIndex = 2
-      ExplicitHeight = 272
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object pnlEva: TPanel
         Left = 0
         Top = 0
@@ -581,7 +618,7 @@ object Main: TMain
         Left = 0
         Top = 30
         Width = 706
-        Height = 263
+        Height = 253
         Align = alClient
         AutoFitColWidths = True
         FilterEditMode = False
@@ -595,6 +632,7 @@ object Main: TMain
         FooterFont.Name = 'Tahoma'
         FooterFont.Style = []
         OptionsEh = [dghFixed3D, dghHighlightFocus, dghClearSelection, dghDialogFind, dghColumnResize, dghColumnMove, dghExtendVertLines, dghHideFilterDoApply, dghHighlightNull]
+        ReadOnly = True
         RowDetailPanel.Color = clBtnFace
         TabOrder = 1
         TitleFont.Charset = DEFAULT_CHARSET
@@ -650,11 +688,13 @@ object Main: TMain
       end
       object sbEva: TStatusBar
         Left = 0
-        Top = 293
+        Top = 283
         Width = 706
         Height = 19
         Panels = <
           item
+            Alignment = taCenter
+            Text = '0:0'
             Width = 100
           end
           item
@@ -691,6 +731,11 @@ object Main: TMain
       DisplayLabel = #1054#1090#1095#1077#1089#1090#1074#1086
       FieldName = 'SNAME'
       Size = 30
+    end
+    object mtBDATE: TStringField
+      DisplayLabel = #1056#1086#1076#1080#1083#1089#1103
+      FieldName = 'BDATE'
+      Size = 12
     end
     object mtGOAL: TStringField
       DisplayLabel = #1062#1077#1083#1100' '#1074#1080#1079#1080#1090#1072
@@ -746,6 +791,7 @@ object Main: TMain
   object qReg: TADOQuery
     Connection = MSBase
     CursorType = ctStatic
+    AfterScroll = qRegAfterScroll
     Parameters = <>
     SQL.Strings = (
       'DECLARE @DD1 as DATE, @DD2 as DATE'
@@ -766,6 +812,7 @@ object Main: TMain
       'JOIN DicOrganization DOR on DOR.ORGANIZATION_ID = EXR.BuroId'
       ''
       'WHERE CAST (EXR.AppointmentDT as date) = @DD1'
+      'ORDER BY EXR.AppointmentDT'
       ';')
     Left = 448
     Top = 8

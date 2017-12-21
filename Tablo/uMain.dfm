@@ -44,6 +44,7 @@ object Main: TMain
     FooterFont.Name = 'Tahoma'
     FooterFont.Style = []
     OptionsEh = [dghFixed3D, dghHighlightFocus, dghClearSelection, dghDialogFind, dghColumnResize, dghColumnMove, dghExtendVertLines, dghHideFilterDoApply, dghHighlightNull]
+    ReadOnly = True
     RowDetailPanel.Color = clBtnFace
     TabOrder = 1
     TitleFont.Charset = DEFAULT_CHARSET
@@ -67,10 +68,19 @@ object Main: TMain
         Width = 50
       end
       item
+        Alignment = taCenter
+        AutoFitColWidth = False
+        EditButtons = <>
+        FieldName = 'TIME'
+        Footers = <>
+        Width = 40
+      end
+      item
         AutoFitColWidth = False
         EditButtons = <>
         FieldName = 'LNAME'
         Footers = <>
+        Visible = False
         Width = 100
       end
       item
@@ -78,6 +88,7 @@ object Main: TMain
         EditButtons = <>
         FieldName = 'FNAME'
         Footers = <>
+        Visible = False
         Width = 100
       end
       item
@@ -85,7 +96,15 @@ object Main: TMain
         EditButtons = <>
         FieldName = 'SNAME'
         Footers = <>
+        Visible = False
         Width = 100
+      end
+      item
+        AutoFitColWidth = False
+        EditButtons = <>
+        FieldName = 'ORG'
+        Footers = <>
+        Width = 300
       end
       item
         EditButtons = <>
@@ -102,6 +121,8 @@ object Main: TMain
     Height = 19
     Panels = <
       item
+        Alignment = taCenter
+        Text = '0:0'
         Width = 100
       end
       item
@@ -122,20 +143,33 @@ object Main: TMain
       FieldName = 'ROOM'
       Size = 10
     end
+    object mtTIME: TStringField
+      DisplayLabel = #1042#1088#1077#1084#1103
+      FieldName = 'TIME'
+      Size = 5
+    end
     object mtLNAME: TStringField
       DisplayLabel = #1060#1072#1084#1080#1083#1080#1103
       FieldName = 'LNAME'
+      Visible = False
       Size = 30
     end
     object mtFNMAE: TStringField
       DisplayLabel = #1048#1084#1103
       FieldName = 'FNAME'
+      Visible = False
       Size = 30
     end
     object mtSNAME: TStringField
       DisplayLabel = #1054#1090#1095#1077#1089#1090#1074#1086
       FieldName = 'SNAME'
+      Visible = False
       Size = 30
+    end
+    object mtORG: TStringField
+      DisplayLabel = #1057#1086#1089#1090#1072#1074
+      FieldName = 'ORG'
+      Size = 100
     end
     object mtGOAL: TStringField
       DisplayLabel = #1062#1077#1083#1100' '#1074#1080#1079#1080#1090#1072

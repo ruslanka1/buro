@@ -2,12 +2,12 @@ object Ticket: TTicket
   Left = 793
   Top = 531
   Caption = #1058#1072#1083#1086#1085
-  ClientHeight = 211
+  ClientHeight = 221
   ClientWidth = 364
   Color = clWhite
-  Constraints.MaxHeight = 250
+  Constraints.MaxHeight = 260
   Constraints.MaxWidth = 380
-  Constraints.MinHeight = 250
+  Constraints.MinHeight = 260
   Constraints.MinWidth = 380
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -20,7 +20,7 @@ object Ticket: TTicket
   PixelsPerInch = 96
   TextHeight = 13
   object lblDate: TLabel
-    Left = 244
+    Left = 188
     Top = 111
     Width = 100
     Height = 25
@@ -61,9 +61,22 @@ object Ticket: TTicket
   object lblRoom: TLabel
     Left = 8
     Top = 111
-    Width = 112
+    Width = 81
     Height = 25
-    Caption = #1050#1072#1073#1080#1085#1077#1090' '#8470
+    Caption = #1050#1072#1073#1080#1085#1077#1090
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -21
+    Font.Name = 'Tahoma'
+    Font.Style = []
+    ParentFont = False
+  end
+  object lblTime: TLabel
+    Left = 305
+    Top = 111
+    Width = 51
+    Height = 25
+    Caption = '22:22'
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
     Font.Height = -21
@@ -73,7 +86,7 @@ object Ticket: TTicket
   end
   object btnPrint: TButton
     Left = 8
-    Top = 180
+    Top = 192
     Width = 89
     Height = 25
     Caption = #1055#1077#1095#1072#1090#1072#1090#1100
@@ -83,7 +96,7 @@ object Ticket: TTicket
   end
   object btnSend: TButton
     Left = 98
-    Top = 180
+    Top = 192
     Width = 97
     Height = 25
     Caption = #1054#1090#1087#1088#1072#1074#1080#1090#1100
@@ -93,7 +106,7 @@ object Ticket: TTicket
   end
   object btnPrintSend: TButton
     Left = 196
-    Top = 180
+    Top = 192
     Width = 160
     Height = 25
     Caption = #1055#1077#1095#1072#1090#1072#1090#1100' '#1080' '#1086#1090#1087#1088#1072#1074#1080#1090#1100
@@ -105,9 +118,15 @@ object Ticket: TTicket
     Left = 8
     Top = 142
     Width = 348
-    Height = 32
+    Height = 44
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -16
+    Font.Name = 'Tahoma'
+    Font.Style = []
     Lines.Strings = (
       #1054#1088#1075#1072#1085#1080#1079#1072#1094#1080#1103)
+    ParentFont = False
     TabOrder = 3
   end
   object IdSMTP: TIdSMTP

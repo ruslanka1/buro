@@ -48,6 +48,8 @@ type
     lblGOAL: TLabel;
     edGOAL: TEdit;
     stStatus: TPanel;
+    lblEvaOrg: TLabel;
+    mmOrg: TMemo;
     procedure btnScanClick(Sender: TObject);
     procedure edCodeKeyPress(Sender: TObject; var Key: Char);
     procedure FormShow(Sender: TObject);
@@ -159,6 +161,8 @@ begin
     edTicket.Text:= Ini.ReadString('Person','ticket','');
     edOLD.Text:= Ini.ReadString('Person','old','');
     edGOAL.Text:= Ini.ReadString('Person','goal','');
+    mmORG.Text:= Ini.ReadString('Person','evaorg','');
+    lblEvaOrg.Caption:= Ini.ReadString('Person','evatime','');
     imgPerson.Picture.LoadFromFile(c_dir+'\'+FIMG);
     imgPerson.Show;
   finally
@@ -233,6 +237,9 @@ begin
   edOLD.Text:= '';
   edROOM.Text:= '';
   edTicket.Text:='';
+  edGOAL.Text:='';
+  lblEvaOrg.Caption:='';
+  mmOrg.Lines.Text:='';
   imgPerson.Hide;
 end;
 
