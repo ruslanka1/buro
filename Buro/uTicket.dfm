@@ -20,7 +20,7 @@ object Ticket: TTicket
   PixelsPerInch = 96
   TextHeight = 13
   object lblDate: TLabel
-    Left = 188
+    Left = 256
     Top = 111
     Width = 100
     Height = 25
@@ -72,7 +72,7 @@ object Ticket: TTicket
     ParentFont = False
   end
   object lblTime: TLabel
-    Left = 305
+    Left = 183
     Top = 111
     Width = 51
     Height = 25
