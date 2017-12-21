@@ -15,6 +15,27 @@ uses
   IdSSL, IdSSLOpenSSL, IdMessage, IdBaseComponent, IdComponent, IdTCPConnection,
   IdTCPClient, IdExplicitTLSClientServerBase, IdMessageClient, IdSMTPBase,
   IdSMTP, Data.Win.ADODB;
+{$ENDIF}
+{$IFDEF UNIX}
+uses
+  Windows, Messages, 
+  SysUtils, Variants, Classes, 
+  Vcl.Graphics, Vcl.Forms, Vcl.Dialogs, 
+  Vcl.Controls, Vcl.ComCtrls, Vcl.StdCtrls, Vcl.ExtCtrls, 
+  Vcl.Mask, 
+  DBCtrlsEh,
+  DBGridEhGrouping, 
+  GridsEh, DBGridEh, 
+  Data.DB,
+  Data.Win.ADODB,
+  MemDB, 
+  ssWorks, SSheets, 
+  IdIOHandler, IdIOHandlerSocket, IdIOHandlerStack,
+  IdSSL, IdSSLOpenSSL, IdMessage, IdBaseComponent, IdComponent, IdTCPConnection,
+  IdTCPClient, IdExplicitTLSClientServerBase, IdMessageClient, IdSMTPBase,
+  IdSMTP
+  ;
+{$ENDIF}
 
 type
 
