@@ -77,7 +77,7 @@ object Main: TMain
     Top = 41
     Width = 714
     Height = 330
-    ActivePage = tsPerson
+    ActivePage = tsTurn
     Align = alClient
     TabOrder = 1
     ExplicitHeight = 300
@@ -419,10 +419,6 @@ object Main: TMain
     object tsTurn: TTabSheet
       Caption = #1054#1095#1077#1088#1077#1076#1100
       ImageIndex = 1
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object pnlTurn: TPanel
         Left = 0
         Top = 0
@@ -483,6 +479,14 @@ object Main: TMain
             Width = 50
           end
           item
+            Alignment = taCenter
+            AutoFitColWidth = False
+            EditButtons = <>
+            FieldName = 'TIME'
+            Footers = <>
+            Width = 40
+          end
+          item
             AutoFitColWidth = False
             EditButtons = <>
             FieldName = 'LNAME'
@@ -538,10 +542,6 @@ object Main: TMain
     object tsList: TTabSheet
       Caption = #1057#1087#1080#1089#1086#1082
       ImageIndex = 2
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object pnlEva: TPanel
         Left = 0
         Top = 0
@@ -708,6 +708,11 @@ object Main: TMain
       FieldName = 'ROOM'
       Size = 10
     end
+    object mtTIME: TStringField
+      DisplayLabel = #1042#1088#1077#1084#1103
+      FieldName = 'TIME'
+      Size = 5
+    end
     object mtLNAME: TStringField
       DisplayLabel = #1060#1072#1084#1080#1083#1080#1103
       FieldName = 'LNAME'
@@ -853,11 +858,5 @@ object Main: TMain
       FixedChar = True
       Size = 10
     end
-  end
-  object ssw: TSSWriter
-    NewSheetName = #1057#1090#1088#1072#1085#1080#1094#1072
-    Server = sssExcel
-    Left = 496
-    Top = 8
   end
 end

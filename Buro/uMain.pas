@@ -6,7 +6,7 @@ uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.Mask, DBCtrlsEh,
   Vcl.ExtCtrls, DBGridEhGrouping, GridsEh, DBGridEh, Vcl.ComCtrls, Data.DB,
-  MemDB, ssWorks, SSheets, IdIOHandler, IdIOHandlerSocket, IdIOHandlerStack,
+  MemDB, IdIOHandler, IdIOHandlerSocket, IdIOHandlerStack,
   IdSSL, IdSSLOpenSSL, IdMessage, IdBaseComponent, IdComponent, IdTCPConnection,
   IdTCPClient, IdExplicitTLSClientServerBase, IdMessageClient, IdSMTPBase,
   IdSMTP, Data.Win.ADODB;
@@ -83,7 +83,6 @@ type
     dsReg: TDataSource;
     MSBase: TADOConnection;
     qReg: TADOQuery;
-    ssw: TSSWriter;
     lblEvaIP: TLabel;
     edEvaIP: TEdit;
     lblEvaBD: TLabel;
@@ -102,6 +101,7 @@ type
     mtBDATE: TStringField;
     lblTime: TLabel;
     edTime: TEdit;
+    mtTIME: TStringField;
     procedure btnNewClick(Sender: TObject);
     procedure btnScanClick(Sender: TObject);
     procedure btnPrintClick(Sender: TObject);
@@ -116,10 +116,10 @@ type
     procedure qRegAfterScroll(DataSet: TDataSet);
   private
     { Private declarations }
-    f_ticket: integer;
     app_dir,
     cur_dir,
     prs_dir: string;
+    f_save: boolean;
     procedure scan;
     procedure save;
     procedure clear;
@@ -135,6 +135,7 @@ type
     procedure turn_write(lst: TStringList);  // Записать очередь
     procedure GetConLst;
     procedure GetAllFiles(Path: string; Lb: TStringList; All: boolean=False);
+    procedure GetAllDir(Path: string; Lb: TStringList; All: boolean=False);
     function get_ticket: integer;
   public
     { Public declarations }
@@ -215,15 +216,8 @@ begin
   edEvaID.Text:= '';
   edTime.Text:= '';
   mmOrg.Lines.Text:= '';
-{
-  if f_date < date then
-  begin
-    f_date:= date;
-    f_ticket:=0;
-  end;
-}
-  f_ticket:= get_ticket;
-  edTicket.Text:=IntToStr(f_ticket);
+  edTicket.Text:='';
+  f_save:= False;
   imgPerson.Hide;
 end;
 
@@ -241,9 +235,9 @@ end;
 procedure TMain.FormShow(Sender: TObject);
 var dir: string;
 begin
+  cur_dir:= FDIR+'\'+FormatDateTime('yyyy-mm-dd', date);
   LoadDir;
   app_dir:= ExtractFilePath(Application.ExeName);
-  edTicket.Text:= IntToStr(f_ticket);
   dir:= app_dir+'\About.jpg';
   imgPerson.Picture.LoadFromFile(dir);
   imgPerson.Show;
@@ -269,6 +263,8 @@ begin
   Ticket.fdir:= prs_dir;
   Ticket.femail:= trim(edMAIL.Text);
   Ticket.ShowModal;
+  // if Ticket.ShowModal <> mrOk then
+  //   удалить  prs_dir ???
 end;
 
 procedure TMain.save;
@@ -304,6 +300,8 @@ begin
     exit;
   end;
 }
+  edTicket.Text:=IntToStr(get_ticket);
+  Application.ProcessMessages;
   cdt:= now;
   Ini:=TiniFile.Create(prs_dir+'\'+FINI);
   try
@@ -333,6 +331,7 @@ begin
     save_eva(cdt);
   finally
     Ini.Free;
+    f_save:= True;
   end;
 end;
 
@@ -446,8 +445,6 @@ begin
     Reg.WriteInteger(Name, 'Top',    Main.Top);
     Reg.WriteInteger(Name, 'Height', Main.Height);
     Reg.WriteInteger(Name, 'Width',  Main.Width);
-    //Reg.WriteInteger(Name, 'ticket', f_ticket);
-    //Reg.WriteString (Name, 'sdate', DateToStr(date));
     Reg.WriteString (Name, 'eva_bd', Trim(edEvaBD.Text));
     Reg.WriteString (Name, 'eva_ip', Trim(edEvaIP.Text));
     Reg.WriteString (Name, 'eva_pt', Trim(edEvaPort.Text));
@@ -474,15 +471,9 @@ begin
     Main.Top:=      Reg.ReadInteger(Name, 'Top',    Main.Top);
     Main.Height:=   Reg.ReadInteger(Name, 'Height', Main.Height);
     Main.Width:=    Reg.ReadInteger(Name, 'Width',  Main.Width);
-    edEvaBD.Text:=  Reg.ReadString(Name, 'eva_bd', '');
-    edEvaIP.Text:=  Reg.ReadString(Name, 'eva_ip', '');
-    edEvaPort.Text:=Reg.ReadString(Name, 'eva_pt', '');
-{
-    f_ticket:=      Reg.ReadInteger(Name, 'ticket', 0);
-    cdate:=         StrToDate(Reg.ReadString (Name, 'sdate', '01.01.1900'));
-    if cdate < date then
-      f_ticket:=0;
-}
+    edEvaBD.Text:=  Reg.ReadString (Name, 'eva_bd', '');
+    edEvaIP.Text:=  Reg.ReadString (Name, 'eva_ip', '');
+    edEvaPort.Text:=Reg.ReadString (Name, 'eva_pt', '');
   finally
     Reg.Free;
   end;
@@ -559,12 +550,24 @@ var
       fXML.Add('    <DT>'+sxml(FormatDateTime('yyyy-mm-dd hh:mm:ss',dt))+'</DT>');
       fXML.Add('    <ID>'+sxml(id)+'</ID>');
       fXML.Add('    <EVAID>'+sxml(edEvaID.Text)+'</EVAID>');
-      fXML.Add('    <NUM>'+sxml(Format('%.3d', [f_ticket]))+'</NUM>');
+      fXML.Add('    <NUM>'+sxml(edTicket.Text)+'</NUM>');
       fXML.Add('    <LNAME>'+sxml(edLNAME.Text)+'</LNAME>');
       fXML.Add('    <FNAME>'+sxml(edFNAME.Text)+'</FNAME>');
       fXML.Add('    <SNAME>'+sxml(edSNAME.Text)+'</SNAME>');
       fXML.Add('    <BDATE>'+sxml(edBDATE.Text)+'</BDATE>');
       fXML.Add('    <GOAL>'+sxml(edGOAL.Text)+'</GOAL>');
+      fXML.Add('    <DOCSER>'+sxml(edDOCSER.Text)+'</DOCSER>');
+      fXML.Add('    <DOCNUM>'+sxml(edDOCNUM.Text)+'</DOCNUM>');
+      fXML.Add('    <SEX>'+sxml(edSEX.Text)+'</SEX>');
+      fXML.Add('    <BPLACE>'+sxml(edBPLACE.Text)+'</BPLACE>');
+      fXML.Add('    <WhDOC>'+sxml(edWhDOC.Text)+'</WhDOC>');
+      fXML.Add('    <DTDOC>'+sxml(edDTDOC.Text)+'</DTDOC>');
+      fXML.Add('    <CODEDOC>'+sxml(edCODEDOC.Text)+'</CODEDOC>');
+      fXML.Add('    <MAIL>'+sxml(edROOM.Text)+'</MAIL>');
+      fXML.Add('    <OLD>'+sxml(edOLD.Text)+'</OLD>');
+      fXML.Add('    <ROOM>'+sxml(edGOAL.Text)+'</ROOM>');
+      fXML.Add('    <TIME>'+sxml(edTime.Text)+'</TIME>');
+      fXML.Add('    <ORG>'+sxml(mmOrg.Lines.Text)+'</ORG>');
     finally
       fXML.Add('  </Person>');
     end;
@@ -572,7 +575,7 @@ var
 begin
   if (CreateGUID(MyGUID) = 0) then
   begin
-    s:= FormatDateTime('yyyy_mm_dd-', date)+Format('%.3d', [f_ticket]);
+    s:= FormatDateTime('yyyy_mm_dd-', date)+edTicket.Text;
     fXML:= TStringList.Create;
     try
       XmlHeader;
@@ -635,6 +638,7 @@ begin
       try
         mt.Append;
         mtNUM.AsString:=   set_code(Ini.ReadString('Person','ticket',''));
+        mtTIME.AsString:=  Ini.ReadString('Person','evatime','');
         mtLNAME.AsString:= Ini.ReadString('Person','lname','');
         mtFNMAE.AsString:= Ini.ReadString('Person','fname','');
         mtSNAME.AsString:= Ini.ReadString('Person','sname','');
@@ -695,6 +699,29 @@ begin
         if str = sub then
           Lb.Add(Path + '\' + sRec.Name);
       end;
+    end;
+    Application.ProcessMessages;
+    isFound:= FindNext(sRec) = 0;
+  end;
+  FindClose(sRec);
+end;
+
+procedure TMain.GetAllDir(Path: string; Lb: TStringList; All: boolean=False);
+var
+  sRec: TSearchRec;
+  isFound: boolean;
+begin
+  isFound := FindFirst( Path + '\*.*', faAnyFile, sRec ) = 0;
+  while isFound do
+  begin
+    if (sRec.Name <> '.') and (sRec.Name <> '..') then
+    begin
+      if (sRec.Attr and faDirectory) = faDirectory then
+      begin
+        Lb.Add(Path + '\' + sRec.Name);
+        if All then
+          GetAllDir(Path + '\' + sRec.Name, Lb, All);
+      end
     end;
     Application.ProcessMessages;
     isFound:= FindNext(sRec) = 0;
@@ -797,11 +824,11 @@ begin
   fnl:= TStringList.Create;
   dnl:= TStringList.Create;
   try
-    GetAllFiles(cur_dir, fnl, True);
+    GetAllDir(cur_dir, fnl, true);
     for i := 0 to fnl.Count - 1 do
     begin
       dnl.Text:= StringReplace(fnl[i],'\',#13#10,[rfReplaceAll]);
-      j:= StrToIntDef(dnl[dnl.Count-2], 0);
+      j:= StrToIntDef(dnl[dnl.Count-1], 0);
       if k < j then
         k:= j;
     end;
@@ -809,7 +836,7 @@ begin
     fnl.Free;
     dnl.Free;
     inc(k);
-    prs_dir:= cur_dir+'\'+Format('%.3d', [k]);  //IntToStr(f_ticket);
+    prs_dir:= cur_dir+'\'+Format('%.3d', [k]);
     if DirectoryExists(prs_dir) or CreateDir(prs_dir) then
       Result:= k
     else

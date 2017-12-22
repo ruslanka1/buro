@@ -16,28 +16,28 @@ File_13=TSourceModule,'c:\program files (x86)\embarcadero\rad studio\10.0\SOURCE
 File_14=TSourceModule,'D:\AISU\[PRJS]\MSE\Balans\uBalans.pas',0,1,293,3,309,0,0,,
 
 [Modules]
-Module0=D:\AISU\[PRJS]\MSE\buro\Buro\uTicket.pas
-Module1=D:\AISU\[PRJS]\MSE\Buro\Buro\uMain.pas
+Module0=D:\AISU\[PRJS]\MSE\Buro\Buro\uMain.pas
+Module1=D:\AISU\[PRJS]\MSE\buro\Buro\uTicket.pas
 Module2=default.htm
 Count=3
 EditWindowCount=1
-
-[D:\AISU\[PRJS]\MSE\buro\Buro\uTicket.pas]
-ModuleType=TSourceModule
-FormState=1
-FormOnTop=0
 
 [D:\AISU\[PRJS]\MSE\Buro\Buro\uMain.pas]
 ModuleType=TSourceModule
 FormState=1
 FormOnTop=0
 
+[D:\AISU\[PRJS]\MSE\buro\Buro\uTicket.pas]
+ModuleType=TSourceModule
+FormState=1
+FormOnTop=1
+
 [default.htm]
 ModuleType=TURLModule
 
 [EditWindow0]
 ViewCount=3
-CurrentEditView=D:\AISU\[PRJS]\MSE\buro\Buro\uTicket.pas
+CurrentEditView=D:\AISU\[PRJS]\MSE\Buro\Buro\uMain.pas
 View0=0
 View1=1
 View2=2
@@ -77,20 +77,20 @@ WelcomePageURL=bds:/default.htm
 [View1]
 CustomEditViewType=TEditView
 Module=D:\AISU\[PRJS]\MSE\Buro\Buro\uMain.pas
-CursorX=3
-CursorY=263
-TopLine=244
+CursorX=36
+CursorY=536
+TopLine=531
 LeftCol=1
 Elisions=
-Bookmarks={1,333,19}
+Bookmarks={1,219,1}{2,299,1}
 EditViewName=D:\AISU\[PRJS]\MSE\Buro\Buro\uMain.pas
 
 [View2]
 CustomEditViewType=TEditView
 Module=D:\AISU\[PRJS]\MSE\buro\Buro\uTicket.pas
 CursorX=1
-CursorY=58
-TopLine=50
+CursorY=1
+TopLine=1
 LeftCol=1
 Elisions=
 Bookmarks=
@@ -121,8 +121,7 @@ Dockable=1
 StayOnTop=0
 
 [Breakpoints]
-Count=1
-Breakpoint0='D:\AISU\[PRJS]\MSE\Buro\Buro\uMain.pas',463,'',0,1,'',1,0,0,'',1,'','','',0,''
+Count=0
 
 [EmbarcaderoWin32Debugger_AddressBreakpoints]
 Count=0
@@ -232,7 +231,7 @@ SplitPos=65
 
 [PropInspDesignerSelection]
 ArrangeBy=Name
-SelectedItem=Lines,OnClick
+SelectedItem=Caption,OnClick
 ExpandedItems=Anchors=0,BorderIcons=0,Constraints=1,AllowedOperations=0,AllowedSelections=0,ColumnDefValues=0,DataSource=0,LiveBindings=0,DataGrouping=0,DataLink=0,EditActions=0,EditButtonsShowOptions=0,Font=0,FooterFont=0,HorzScrollBar=0,IndicatorTitle=0,"LiveBindings Designer=0",Margins=0,Options=0,OptionsEh=0,ExecuteOptions=0,ImageMargins=0,StyleElements=0,Touch=0,BevelEdges=0,SSLOptions=0,IOHandler=0,SASLMechanisms=0,GlassFrame=0,DropDownBox=0,DropDownSpecRow=0,Footer=0,ProviderFlags=0,MRUList=0,STFilter=0,Title=0,Connection=0,RowDetailPanel=0,RowPanel=0,SumList=0,TitleFont=0,VertScrollBar=0,Action=0
 
 [TFileExplorerForm]
