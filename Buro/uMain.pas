@@ -29,7 +29,7 @@ uses
   DB,
 //  ADODB,
 //  MemDB, 
-  ssWorks, SSheets, 
+//  ssWorks, SSheets, 
   IdIOHandler, IdIOHandlerSocket, IdIOHandlerStack,
   IdSSL, IdSSLOpenSSL, IdMessage, IdBaseComponent, IdComponent, IdTCPConnection,
   IdTCPClient, IdExplicitTLSClientServerBase, IdMessageClient, IdSMTPBase,
