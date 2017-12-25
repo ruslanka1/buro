@@ -14,6 +14,14 @@
 *.dsk
 *.identcache
 *.ico
+*.bak
+# Lazaros artefacts:
+*.compiled
+*.lps
+*.o
+*.or
+*.ppu
+*.pas.w
 # Игнорирование файла во ВСЕХ директориях
 # Например /params/db/config.php, /config.php
 # config.php
@@ -32,6 +40,8 @@
 # Игнорирование всех файлов и папок в ЛЮБЫХ директориях с указанным именем
 # Например /images/user.jpg, /core/images/user.jpg
 # images/*
+*/backup/*
+*/ConverterBackup/*
 # Игнорирование ВСЕХ html-файлов в ОДНОЙ КОНКРЕТНОЙ директории(НЕ ВКЛЮЧАЯ поддиректории)
 # Например /private/index.html
 # НЕ БУДУТ проигнорированы файлы в /private/ivan/index.html
