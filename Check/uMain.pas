@@ -163,7 +163,10 @@ begin
     edGOAL.Text:= Ini.ReadString('Person','goal','');
     mmORG.Text:= Ini.ReadString('Person','evaorg','');
     lblEvaOrg.Caption:= Ini.ReadString('Person','evatime','');
-    imgPerson.Picture.LoadFromFile(c_dir+'\'+FIMG);
+    if FileExists(c_dir+'\'+FIMG) then
+      imgPerson.Picture.LoadFromFile(c_dir+'\'+FIMG)
+    else
+      imgPerson.Picture.LoadFromFile(ExtractFilePath(Application.ExeName)+'\About.jpg');
     imgPerson.Show;
   finally
     Ini.Free;

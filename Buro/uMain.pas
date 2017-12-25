@@ -1,21 +1,41 @@
 unit uMain;
 
+{$IFDEF FPC}
+  {$MODE Delphi}
+{$ENDIF}
+
 interface
 
+{$IFDEF MSWINDOWS}
 uses
-  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
-  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.Mask, DBCtrlsEh,
-  Vcl.ExtCtrls, DBGridEhGrouping, GridsEh, DBGridEh, Vcl.ComCtrls, Data.DB,
-  MemDB, ssWorks, SSheets, IdIOHandler, IdIOHandlerSocket, IdIOHandlerStack,
-  IdSSL, IdSSLOpenSSL, IdMessage, IdBaseComponent, IdComponent, IdTCPConnection,
-  IdTCPClient, IdExplicitTLSClientServerBase, IdMessageClient, IdSMTPBase,
-  IdSMTP, Data.Win.ADODB;
+  Winapi.Windows, Winapi.Messages,
+  System.SysUtils, System.Variants, System.Classes,
+  Vcl.Graphics, Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.ComCtrls,
+  Vcl.StdCtrls, Vcl.ExtCtrls,
+  Vcl.Mask
+  DBCtrlsEh,
+  DBGridEhGrouping, GridsEh, DBGridEh
+  ;
+{$ELSE}
+  uses
+  SysUtils, Variants, Classes,
+  Graphics, Controls, Forms, Dialogs, ComCtrls,
+  StdCtrls, ExtCtrls
+//  Mask,
+//  DBGrid
+  , DBGrids
+  , DateTimeCtrls
+  , DateTimePicker
+  ;
+{$ENDIF}
 
 type
 
   { TMain }
 
   TMain = class(TForm)
+    DateTimePicker1: TDateTimePicker;
+    DateTimePicker2: TDateTimePicker;
     pnlTop: TPanel;
     btnNew: TButton;
     btnPrint: TButton;
@@ -24,7 +44,11 @@ type
     pcPGS: TPageControl;
     tsPerson: TTabSheet;
     tsTurn: TTabSheet;
+<<<<<<< HEAD
     grdTurn: TDBGridEh;
+=======
+    grdTurn: TDBGrid;
+>>>>>>> 1-merge
     imgPerson: TImage;
     sbTurn: TStatusBar;
     pnlTurn: TPanel;
@@ -51,8 +75,8 @@ type
     edOLD: TEdit;
     lblROOM: TLabel;
     edROOM: TEdit;
-    edBDATE: TDBDateTimeEditEh;
-    edDTDOC: TDBDateTimeEditEh;
+    edBDATE: TDateTimePicker;
+    edDTDOC: TDateTimePicker;
     lblTicket: TLabel;
     edTicket: TEdit;
     stStatus: TStaticText;
@@ -62,54 +86,6 @@ type
     edDOCNUM: TEdit;
     lblGOAL: TLabel;
     edGOAL: TEdit;
-    stStatus: TPanel;
-    tsList: TTabSheet;
-    lblEvaID: TLabel;
-    edEvaID: TEdit;
-    btnEvaID: TButton;
-    pnlTurn: TPanel;
-    grdTurn: TDBGridEh;
-    sbTurn: TStatusBar;
-    mt: TMemTable;
-    mtNUM: TStringField;
-    mtROOM: TStringField;
-    mtLNAME: TStringField;
-    mtFNMAE: TStringField;
-    mtSNAME: TStringField;
-    mtGOAL: TStringField;
-    ds: TDataSource;
-    btnTurnRefresh: TButton;
-    pnlEva: TPanel;
-    btnEvaRefresh: TButton;
-    grdEva: TDBGridEh;
-    sbEva: TStatusBar;
-    mtReg: TMemTable;
-    mtRegNumReg: TIntegerField;
-    mtRegNmReg: TStringField;
-    mtRegBdReg: TIntegerField;
-    mtRegConnect: TStringField;
-    dsReg: TDataSource;
-    MSBase: TADOConnection;
-    qReg: TADOQuery;
-    ssw: TSSWriter;
-    lblEvaIP: TLabel;
-    edEvaIP: TEdit;
-    lblEvaBD: TLabel;
-    edEvaBD: TEdit;
-    lblEvaPort: TLabel;
-    edEvaPort: TEdit;
-    qRegGUID: TStringField;
-    qRegLNAME: TWideStringField;
-    qRegFNAME: TWideStringField;
-    qRegSNAME: TWideStringField;
-    qRegDT_MSE: TDateTimeField;
-    qRegORG: TWideStringField;
-    qRegROOM: TWideStringField;
-    lblEvaOrg: TLabel;
-    mmOrg: TMemo;
-    mtBDATE: TStringField;
-    lblTime: TLabel;
-    edTime: TEdit;
     procedure btnNewClick(Sender: TObject);
     procedure btnScanClick(Sender: TObject);
     procedure btnPrintClick(Sender: TObject);
@@ -117,18 +93,10 @@ type
     procedure FormShow(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure edBDATEExit(Sender: TObject);
-    procedure btnEvaIDClick(Sender: TObject);
-    procedure mtAfterScroll(DataSet: TDataSet);
-    procedure btnTurnRefreshClick(Sender: TObject);
-    procedure btnEvaRefreshClick(Sender: TObject);
-    procedure grdEvaDblClick(Sender: TObject);
-    procedure qRegAfterScroll(DataSet: TDataSet);
   private
     { Private declarations }
     f_ticket: integer;
-    app_dir,
-    cur_dir,
-    prs_dir: string;
+    app_dir: string;
     procedure scan;
     procedure send;
     procedure save;
@@ -137,6 +105,7 @@ type
     procedure srun(nm: string);
     procedure init_ticket;
     function  set_barcode(s_num: string): string;
+<<<<<<< HEAD
     procedure SaveDir;     // Ñîõðàíÿåì ïóòè â ðååñòð
     procedure LoadDir;     // Ñ÷èòûâàåì ïóòè èç ðååñòðà
     procedure save_eva(dt: TDateTime);
@@ -146,6 +115,10 @@ type
     procedure GetConLst;
     procedure GetAllFiles(Path: string; Lb: TStringList; All: boolean=False);
     function get_ticket: integer;
+=======
+    procedure SaveDir;     // Сохраняем пути в реестр
+    procedure LoadDir;     // Считываем пути из реестра
+>>>>>>> 1-merge
   public
     { Public declarations }
   end;
@@ -161,7 +134,6 @@ const
   {$ENDIF}
   FINI = 'data.ini';
   FIMG = 'data.jpg';
-  FEVA = 'Z:\buro\_eva';
 
 implementation
 
@@ -177,6 +149,7 @@ uses IniFiles,
 
 {$R *.dfm}
 
+<<<<<<< HEAD
 procedure TMain.btnEvaRefreshClick(Sender: TObject);
 begin
   GetConLst;
@@ -187,6 +160,8 @@ begin
   Application.MessageBox('Ïîèñê â ÅÀÂÈÈÀÑ...','Âíèìàíèå');
 end;
 
+=======
+>>>>>>> 1-merge
 procedure TMain.btnNewClick(Sender: TObject);
 begin
   clear;
@@ -204,9 +179,10 @@ begin
   scan;
 end;
 
-procedure TMain.btnTurnRefreshClick(Sender: TObject);
+procedure TMain.btnSendClick(Sender: TObject);
 begin
-  turn_refresh;
+  save;
+  send;
 end;
 
 procedure TMain.calc_old;
@@ -222,70 +198,65 @@ end;
 
 procedure TMain.clear;
 begin
-  stStatus.Caption:= '';
-  edDOCSER.Text:= '';
-  edDOCNUM.Text:= '';
-  edLNAME.Text:= '';
-  edFNAME.Text:= '';
-  edSNAME.Text:= '';
-  edSEX.Text:= '';
-  edBDATE.Text:= '';
-  edBPLACE.Text:= '';
-  edWhDOC.Text:= '';
-  edDTDOC.Text:= '';
+  stStatus.Caption := '';
+  edDOCSER.Text := '';
+  edDOCNUM.Text := '';
+  edLNAME.Text  := '';
+  edFNAME.Text  := '';
+  edSNAME.Text  := '';
+  edSEX.Text    := '';
+  {$IFDEF MSWINDOWS}
+  edBDATE.Text  := '';
+  {$ELSE}
+  edBDATE.Date  := NullDate; // EncodeDate (1800, 1, 1);
+  {$ENDIF}
+  edBPLACE.Text := '';
+  edWhDOC.Text  := '';
+  {$IFDEF MSWINDOWS}
+  edDTDOC.Text  := '';
+  {$ELSE}
+  edDTDOC.Date  := NullDate; // EncodeDate (1800, 1, 1);
+  {$ENDIF}
   edCODEDOC.Text:= '';
-  edMAIL.Text:= '';
-  edOLD.Text:= '';
-  edROOM.Text:= '';
-  edGOAL.Text:= '';
-  edEvaID.Text:= '';
-  edTime.Text:= '';
-  mmOrg.Lines.Text:= '';
-{
-  if f_date < date then
-  begin
-    f_date:= date;
-    f_ticket:=0;
-  end;
-}
-  f_ticket:= get_ticket;
-  edTicket.Text:=IntToStr(f_ticket);
+  edMAIL.Text   := '';
+  edOLD.Text    := '';
+  edROOM.Text   := '';
+  edTicket.Text := IntToStr (f_ticket);
+
   imgPerson.Hide;
 end;
 
-procedure TMain.edBDATEExit(Sender: TObject);
+procedure TMain.edBDATEExit (Sender: TObject);
 begin
   calc_old;
 end;
 
-procedure TMain.FormClose(Sender: TObject; var Action: TCloseAction);
+procedure TMain.FormClose (Sender: TObject; var Action: TCloseAction);
 begin
-  clear;
   SaveDir;
 end;
 
-procedure TMain.FormShow(Sender: TObject);
-var dir: string;
+procedure TMain.FormShow (Sender: TObject);
+var
+  dir: string;
 begin
   LoadDir;
-  app_dir:= ExtractFilePath(Application.ExeName);
-  edTicket.Text:= IntToStr(f_ticket);
-  dir:= app_dir+'\About.jpg';
-  imgPerson.Picture.LoadFromFile(dir);
+  app_dir:= ExtractFilePath (Application.ExeName);
+  edTicket.Text := IntToStr (f_ticket);
+  dir := IncludeTrailingPathDelimiter (app_dir) + 'About.jpg';
+  imgPerson.Picture.LoadFromFile (dir);
   imgPerson.Show;
-  clear;
-  pcPGS.ActivePage:= tsPerson;
+  pcPGS.ActivePage := tsPerson;
 end;
 
 function TMain.set_barcode(s_num: string): string;
-var dt_num: string;
 begin
-  dt_num:= IntToStr(DayOfTheYear(date));
-  Result:= '*'+RightStr('000'+dt_num, 3)+RightStr('000'+s_num, 3)+'*';
+  Result := '*' + RightStr ('00000' + s_num, 5) + '*';
 end;
 
 procedure TMain.init_ticket;
 begin
+<<<<<<< HEAD
   Ticket.mmOrg.Lines.Text:= trim(mmOrg.Lines.Text);
   Ticket.lblDate.Caption := FormatDateTime('dd.mm.yyyy', date);
   Ticket.lblTime.Caption := trim(edTime.Text);
@@ -294,72 +265,97 @@ begin
   Ticket.lblBarcode.Caption:= Ticket.lblNumber.Caption;
   Ticket.fdir:= prs_dir;
   Ticket.femail:= trim(edMAIL.Text);
+=======
+  Ticket.lblTitle.Caption   := 'ФГБУ ФБ МСЭ';
+  Ticket.lblDate.Caption    := FormatDateTime ('dd.mm.yyyy', date);
+  Ticket.lblRoom.Caption    := edROOM.Text;
+  Ticket.lblNumber.Caption  := set_barcode (edTicket.Text);
+  Ticket.lblBarcode.Caption := Ticket.lblNumber.Caption;
+>>>>>>> 1-merge
   Ticket.ShowModal;
 end;
 
 procedure TMain.save;
 var
-  //c_dir: string;
+  s, c_dir: string;
   Ini: Tinifile;
-  cdt: TDateTime;
 begin
-{
   if not DirectoryExists(FDIR) then
   begin
+<<<<<<< HEAD
     stStatus.Caption:=  'Íåò ïîäêëþ÷åíèÿ ê õðàíèëèùó !';
     stStatus.Color:= clFuchsia;
     Application.ProcessMessages;
+=======
+    s:= 'Папка ' + FDIR + ' не существует...';
+    Application.MessageBox(PChar(s), PChar('Внимание'));
+>>>>>>> 1-merge
     exit;
   end;
 
   c_dir:= FDIR+'\'+FormatDateTime('yyyy-mm-dd', now);
   if (not DirectoryExists(c_dir)) and (not CreateDir(c_dir)) then
   begin
+<<<<<<< HEAD
     stStatus.Caption:=  'Íåò âîçìîæíîñòè íà÷àòü ðåãèñòðàöèþ íà ñåãîäíÿ !';
     stStatus.Color:= clFuchsia;
     Application.ProcessMessages;
+=======
+    s:= 'Папку для копий ' + c_dir + ' не удаётся создать...';
+    Application.MessageBox(PChar(s), PChar('Внимание'));
+>>>>>>> 1-merge
     exit;
   end;
 
-  c_dir:= c_dir+'\'+Format('%.3d', [f_ticket]);  //IntToStr(f_ticket);
+  c_dir:= c_dir+'\'+Format('%.5d', [f_ticket]);  //IntToStr(f_ticket);
   if (not DirectoryExists(c_dir)) and (not CreateDir(c_dir)) then
   begin
+<<<<<<< HEAD
     stStatus.Caption:=  'Íåò âîçìîæíîñòè ñîõðàíèòü ðåãèñòðàöèþ ïîñåòèòåëÿ !';
     stStatus.Color:= clFuchsia;
     Application.ProcessMessages;
+=======
+    s:= 'Папку для талона ' + c_dir + ' не удаётся создать...';
+    Application.MessageBox(PChar(s), PChar('Внимание'));
+>>>>>>> 1-merge
     exit;
   end;
-}
-  cdt:= now;
-  Ini:=TiniFile.Create(prs_dir+'\'+FINI);
+
+  Ini:=TiniFile.Create(c_dir+'\'+FINI);
   try
-    Ini.WriteDateTime('Person','dtcreat',cdt);
     Ini.WriteString('Person','docser',edDOCSER.Text);
     Ini.WriteString('Person','docnum',edDOCNUM.Text);
     Ini.WriteString('Person','fname',edFNAME.Text);
     Ini.WriteString('Person','lname',edLNAME.Text);
     Ini.WriteString('Person','sname',edSNAME.Text);
     Ini.WriteString('Person','sex',edSEX.Text);
+    {$IFDEF MSWINDOWS}
     if (edBDATE.Value <> null) then
-      Ini.WriteDate  ('Person','bdate',edBDATE.Value);
+       Ini.WriteDate  ('Person','bdate',edBDATE.Value);
+    {$ELSE}
+    if (not edBDATE.DateIsNull) then
+       Ini.WriteDate  ('Person','bdate',edBDATE.Date);
+    {$ENDIF}
     Ini.WriteString('Person','bplase',edBPLACE.Text);
     Ini.WriteString('Person','whdoc',edWhDOC.Text);
+    {$IFDEF MSWINDOWS}
     if (edDTDOC.Value <> null) then
       Ini.WriteDate  ('Person','dtdoc',edDTDOC.Value);
+    {$ELSE}
+    if (not edDTDOC.DateIsNull) then
+       Ini.WriteDate  ('Person','dtdoc',edDTDOC.Date);
+    {$ENDIF}
     Ini.WriteString('Person','coddoc',edCODEDOC.Text);
     Ini.WriteString('Person','mail',edMAIL.Text);
     Ini.WriteString('Person','room',edROOM.Text);
     Ini.WriteString('Person','ticket',edTicket.Text);
     Ini.WriteString('Person','old',edOLD.Text);
     Ini.WriteString('Person','goal',edGOAL.Text);
-    Ini.WriteString('Person','evaid',edEvaID.Text);
-    Ini.WriteString('Person','evatime',edTime.Text);
-    Ini.WriteString('Person','evaorg',mmOrg.Lines.Text);
-    imgPerson.Picture.SaveToFile(prs_dir+'\'+FIMG);
-    save_eva(cdt);
+    imgPerson.Picture.SaveToFile(c_dir+'\'+FIMG);
   finally
     f_save:= True;
     Ini.Free;
+    f_ticket:= f_ticket+1;
   end;
 end;
 
@@ -374,8 +370,13 @@ begin
     // WinExec('D:\AISU\[PRJS]\MSE\Buro\Buro\Win32\Debug\pscan.exe',SW_RESTORE)
     srun(s)
   else
+<<<<<<< HEAD
     Application.MessageBox('Ïðîãðàììà ñêàíèðîâàíèÿ íå íàéäåíà...','Âíèìàíèå');
   stStatus.Caption:= '×èòàþ...';
+=======
+    Application.MessageBox('Программа сканирования не найдена...','Внимание');
+  stStatus.Caption:= 'Читаю...';
+>>>>>>> 1-merge
   Application.ProcessMessages;
   s :=  app_dir+'scanned.txt';
   lst:= TStringList.Create;
@@ -390,11 +391,20 @@ begin
     edFNAME.Text := trim(lst.Values ['Name']);
     edSNAME.Text := trim(lst.Values ['Patronymic']);
     edSEX.Text := trim(lst.Values ['Gender']);
+    {$IFDEF MSWINDOWS}
     edBDATE.Text := trim(lst.Values ['Birthdate']);
+    {$ELSE}
+     //FIXME:
+    edBDATE.Date := StrToDate (lst.Values ['Birthdate']);
+    {$ENDIF}
     edBPLACE.Text := trim(lst.Values ['Birthplace']);
     edWhDOC.Text := trim(lst.Values ['Authority']);
     edCODEDOC.Text := trim(lst.Values ['Authority code']);
+    {$IFDEF MSWINDOWS}
     edDTDOC.Text := trim(lst.Values ['Issue date']);
+    {$ELSE}
+    edDTDOC.Date := StrToDate (lst.Values ['Issue date']);
+    {$ENDIF}
   finally
     lst.Free;
     calc_old;
@@ -410,13 +420,21 @@ begin
   s :=  app_dir+'scanned.jpg';
   s_out:= FDIR+'\'+FormatDateTime('yyyy-mm-dd', now)+'\'+edTicket.Text;
   if not CopyFile(PChar(s),PChar(s_out),False) then
+<<<<<<< HEAD
     Application.MessageBox('Îøèáêà êîïèðîâàíèÿ ñêàíà...','Âíèìàíèå');
+=======
+    Application.MessageBox('Ошибка копирования скана...','Внимание');
+>>>>>>> 1-merge
 *)
 end;
 
 procedure TMain.send;
 begin
+<<<<<<< HEAD
   Application.MessageBox('Îòïðàâëÿþ...','Âíèìàíèå');
+=======
+  Application.MessageBox('Отправляю...','Внимание');
+>>>>>>> 1-merge
 end;
 
 function runAndWait (nm: string): Boolean;
@@ -447,6 +465,7 @@ begin
     nShow := SW_HIDE;
   end;
   if not ShellExecuteEx(@SEInfo) then
+<<<<<<< HEAD
     ShowMessage('Ñêàíèðîâàíèå íå çàïóñòèëîñü...')
   else
   begin
@@ -553,20 +572,98 @@ begin
 {$ELSE}
   //FIXME: load configuration
 {$ENDIF}
+=======
+    Exit;
+
+  else
+  begin
+    repeat
+      Sleep (100);
+      Application.ProcessMessages;
+      GetExitCodeProcess (SEInfo.hProcess, ExitCode);
+    until (ExitCode <> STILL_ACTIVE)
+       or  Application.Terminated
+    ;
+    Result := ExitCode <> STILL_ACTIVE
+  end
+{$ELSE}
+var output : ansistring;
+begin
+  Result := RunCommand ('/bin/bash',['-c', nm], output) ;
+//FIXME: save the output
+//  if Result then
+//     writeln (output);
+{$ENDIF}
 end;
 
-procedure TMain.mtAfterScroll(DataSet: TDataSet);
-begin
-  sbTurn.Panels[0].Text:= Format('%d : %d', [DataSet.RecNo, DataSet.RecordCount]);
+type
+
+Sys = class
+public
+  class function systemName () : String;
+  class function OSVersion  () : String;
+  class function command    (cmd: String; args: array of String) : Boolean;
+  class function execUrl    (url : String) : Boolean;
+>>>>>>> 1-merge
 end;
 
-procedure TMain.qRegAfterScroll(DataSet: TDataSet);
+class function Sys.systemName () : String;
 begin
-  sbEva.Panels[0].Text:= Format('%d : %d', [DataSet.RecNo, DataSet.RecordCount]);
+  Result := '?';
+{$IFDEF MSWINDOWS}
+  Result := 'Windows';
+{$ENDIF}
+{$IFDEF LINUX}
+  Result := 'Linux';
+{$ELSE}
+{$IFDEF UNIX}
+  Result := 'Unix';
+{$ENDIF}
+{$ENDIF}
+{$IFDEF OS_X}
+// OS X ?
+  Result := 'Mac';
+{$ENDIF}
 end;
 
-procedure TMain.save_eva(dt: TDateTime);
+//
+// http://forum.lazarus.freepascal.org/index.php?topic=15390.0
+//
+class function Sys.OSVersion () : String;
+ var
+  osErr   : integer;
+  response: longint;
 begin
+  {$IFDEF LCLcarbon}
+  OSVersion := 'Mac OS X 10.';
+  {$ELSE}
+  {$IFDEF Linux}
+  OSVersion := 'Linux Kernel ';
+  {$ELSE}
+  {$IFDEF UNIX}
+  OSVersion := 'Unix ';
+  {$ELSE}
+  {$IFDEF WINDOWS}
+  if WindowsVersion = wv95 then OSVersion := 'Windows 95 '
+   else if WindowsVersion = wvNT4 then OSVersion := 'Windows NT v.4 '
+   else if WindowsVersion = wv98 then OSVersion := 'Windows 98 '
+   else if WindowsVersion = wvMe then OSVersion := 'Windows ME '
+   else if WindowsVersion = wv2000 then OSVersion := 'Windows 2000 '
+   else if WindowsVersion = wvXP then OSVersion := 'Windows XP '
+   else if WindowsVersion = wvServer2003 then OSVersion := 'Windows Server 2003 '
+   else if WindowsVersion = wvVista then OSVersion := 'Windows Vista '
+   else if WindowsVersion = wv7 then OSVersion := 'Windows 7 '
+   else OSVersion:= 'Windows ';
+  {$ENDIF}
+  {$ENDIF}
+  {$ENDIF}
+  {$ENDIF}
+//  Result := OSVersion
+end;
+
+class function Sys.command    (cmd: String; args: array of String) : Boolean;
+begin
+<<<<<<< HEAD
   if not DirectoryExists(FEVA) then
   begin
     stStatus.Caption:=  'Íåò ïîäêëþ÷åíèÿ ê õðàíèëèùó ÅÀÂÈÈÀÑ!';
@@ -586,102 +683,55 @@ begin
     stStatus.Caption:= '';
     Application.ProcessMessages;
   end;
+=======
+  Result := runAndWait (cmd);
+>>>>>>> 1-merge
 end;
 
-procedure TMain.CrtXML(dt: TDateTime);
+//
+// https://stackoverflow.com/questions/36822025/execute-url-path-in-external-program-in-haxe
+//
+
+class function Sys.execUrl (url : String) : Boolean;
 var
-  s: string;
-  fXML: TStringList;
-  MyGUID : TGUID;
-
-  function sxml(str: string): string;
-  begin
-    str:= StringReplace(str,'>','',[rfReplaceAll]);
-    str:= StringReplace(str,'<','',[rfReplaceAll]);
-    Result:= trim(str);
-  end;
-
-  procedure XmlHeader;
-  begin
-    fXML.Clear;
-    fXML.Add('<?xml version="1.0" encoding="WINDOWS-1251"?>');
-    fXML.Add('<EVA xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">');
-    fXML.Add('  <PackageAttrs>');
-    fXML.Add('    <CreatingDateTime>' + FormatDateTime('yyyy-mm-dd hh:mm:ss.zzz',now) + '</CreatingDateTime>');
-    fXML.Add('    <SchemaVersion>1.0</SchemaVersion>');
-    fXML.Add('  </PackageAttrs>');
-  end;
-
-  procedure XmlFooter;
-  begin
-    fXML.Add('</EVA>');
-  end;
-
-  procedure XmlBoby;
-  var id: string;
-  begin
-    id:= StringReplace(StringReplace(GUIDToString(MyGuid),'{','',[]),'}','',[]);
-    fXML.Add('  <Person>');
-    try
-      fXML.Add('    <DT>'+sxml(FormatDateTime('yyyy-mm-dd hh:mm:ss',dt))+'</DT>');
-      fXML.Add('    <ID>'+sxml(id)+'</ID>');
-      fXML.Add('    <EVAID>'+sxml(edEvaID.Text)+'</EVAID>');
-      fXML.Add('    <NUM>'+sxml(Format('%.3d', [f_ticket]))+'</NUM>');
-      fXML.Add('    <LNAME>'+sxml(edLNAME.Text)+'</LNAME>');
-      fXML.Add('    <FNAME>'+sxml(edFNAME.Text)+'</FNAME>');
-      fXML.Add('    <SNAME>'+sxml(edSNAME.Text)+'</SNAME>');
-      fXML.Add('    <BDATE>'+sxml(edBDATE.Text)+'</BDATE>');
-      fXML.Add('    <GOAL>'+sxml(edGOAL.Text)+'</GOAL>');
-    finally
-      fXML.Add('  </Person>');
-    end;
-  end;
+   urlOpen: String;
 begin
-  if (CreateGUID(MyGUID) = 0) then
-  begin
-    s:= FormatDateTime('yyyy_mm_dd-', date)+Format('%.3d', [f_ticket]);
-    fXML:= TStringList.Create;
-    try
-      XmlHeader;
-      try
-        XmlBoby
-      finally
-        XmlFooter;
-      end;
-      fXML.SaveToFile(FEVA+'\'+s+'.xml');
-    finally
-      fXML.Free;
+    case ( Sys.systemName ()[1] ) of
+      'L': urlOpen := 'xdg-open'; // Linux
+      'U': urlOpen := 'xdg-open'; // Unix
+      'M': urlOpen := 'open'    ; // Max (OS X)
+      'W': urlOpen := 'start'   ; // Windows
+      else urlOpen := 'xdg-open'; // FIXME: just hope it's true...
     end;
-  end;
+    Sys.command (urlOpen, [url]);
 end;
 
-procedure TMain.grdEvaDblClick(Sender: TObject);
-begin
-  if not qReg.IsEmpty then
-  begin
-    edEvaID.Text:= qRegGUID.AsString;
-    edTime.Text:= FormatDateTime('hh:nn', qRegDT_MSE.AsDateTime);
-    mmOrg.Lines.Text:= qRegORG.AsString;
-    edROOM.Text:=  qRegROOM.AsString;
-    pcPGS.ActivePage:= tsPerson;
-  end;
-end;
 
+<<<<<<< HEAD
 procedure TMain.turn_refresh;
 var
   s: string;
   lst: TStringList;
+=======
+procedure TMain.srun(nm: string);
+>>>>>>> 1-merge
 begin
-  lst:= TStringList.Create;
   try
-//    prs_dir:= '2017-12-15';
-    GetAllFiles(cur_dir, lst, True);
-    turn_write(lst);
+    Screen.Cursor    := crHourGlass;
+    stStatus.Caption := 'Идёт сканирование...';
+    Application.ProcessMessages;
+
+    if runAndWait (nm) then
+      stStatus.Caption := 'Сканирование закончено.'
+    else
+      ShowMessage ('Сканирование не запустилось...')
+
   finally
-    lst.Free;
-  end;
+    Screen.Cursor := crDefault;
+  end
 end;
 
+<<<<<<< HEAD
 procedure TMain.turn_write(lst: TStringList);
   function set_code(s_num: string): string;
   var dt_num: string;
@@ -810,15 +860,47 @@ begin
         stStatus.Caption:= 'Îøèáêà ïîäêëþ÷åíèÿ ê ÅÀÂÈÈÀÑ ( '+E.Message +' )';
     end;
       Application.ProcessMessages;
+=======
+procedure TMain.SaveDir;
+{$IFDEF MSWINDOWS}
+var Reg: TRegIniFile;
+{$ELSE}
+  //FIXME: introduce application configuration
+{$ENDIF}
+begin
+{$IFDEF MSWINDOWS}
+  // Сохраняем пути в реестр
+  Reg:= TRegIniFile.Create('Software');
+  try
+    Reg.OpenKey(ExtractFileName(ParamStr(0)), true);
+    Reg.WriteInteger(Name, 'Left',   Main.Left);
+    Reg.WriteInteger(Name, 'Top',    Main.Top);
+    Reg.WriteInteger(Name, 'Height', Main.Height);
+    Reg.WriteInteger(Name, 'Width',  Main.Width);
+    Reg.WriteInteger(Name, 'ticket', f_ticket);
+    Reg.WriteString (Name, 'sdate', DateToStr(date));
+//    Reg.WriteString (Name, 'Flt',    edFlt.Value);
+//    Reg.WriteString (Name, 'Src',    edSrc.Value);
+//    Reg.WriteString (Name, 'Cpy',    edCpy.Value);
+  finally
+    Reg.Free;
+>>>>>>> 1-merge
   end;
+{$ELSE}
+    //FIXME: save configuration
+{$ENDIF}
 end;
 
-function TMain.get_ticket: integer;
+procedure TMain.LoadDir;
+{$IFDEF MSWINDOWS}
 var
-  i, j, k: integer;
-  fnl, dnl: TStringList;
-  fbk: string;
+  Reg: TRegIniFile;
+  cdate: TDateTime;
+{$ELSE}
+  //FIXME: introduce application configuration
+{$ENDIF}
 begin
+<<<<<<< HEAD
   Result:= -1;
   cur_dir:= '';
   prs_dir:= '';
@@ -867,16 +949,23 @@ begin
   k:= 0;
   fnl:= TStringList.Create;
   dnl:= TStringList.Create;
+=======
+{$IFDEF MSWINDOWS}
+  // Считываем пути из реестра
+  Reg:= TRegIniFile.Create('Software');
+>>>>>>> 1-merge
   try
-    GetAllFiles(cur_dir, fnl, True);
-    for i := 0 to fnl.Count - 1 do
-    begin
-      dnl.Text:= StringReplace(fnl[i],'\',#13#10,[rfReplaceAll]);
-      j:= StrToIntDef(dnl[dnl.Count-2], 0);
-      if k < j then
-        k:= j;
-    end;
+    Reg.OpenKey(ExtractFileName(ParamStr(0)), true);
+    Main.Left:=    Reg.ReadInteger(Name, 'Left',   Main.Left);
+    Main.Top:=     Reg.ReadInteger(Name, 'Top',    Main.Top);
+    Main.Height:=  Reg.ReadInteger(Name, 'Height', Main.Height);
+    Main.Width:=   Reg.ReadInteger(Name, 'Width',  Main.Width);
+    f_ticket:=     Reg.ReadInteger(Name, 'ticket', 0);
+    cdate:=        StrToDate(Reg.ReadString (Name, 'sdate', '0'));
+    if cdate < date then
+       f_ticket:=0;
   finally
+<<<<<<< HEAD
     fnl.Free;
     dnl.Free;
     inc(k);
@@ -899,7 +988,14 @@ begin
       Application.ProcessMessages;
       Result:= 0;
     end;
+=======
+    inc(f_ticket);
+    Reg.Free;
+>>>>>>> 1-merge
   end;
+{$ELSE}
+  //FIXME: load configuration
+{$ENDIF}
 end;
 
 end.
