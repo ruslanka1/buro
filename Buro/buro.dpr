@@ -1,7 +1,11 @@
 program buro;
 
 uses
+{$IFDEF MSWINDOWS}
   Vcl.Forms,
+{$ELSE}
+  Forms, Interfaces,
+{$ENDIF}
   uMain in 'uMain.pas' {Main},
   uTicket in 'uTicket.pas' {Ticket};
 
