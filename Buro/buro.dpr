@@ -13,7 +13,11 @@ uses
 
 begin
   Application.Initialize;
+  {$IFDEF MSWINDOWS}
   Application.MainFormOnTaskbar := True;
+  {$ELSE}
+  //FIXME: add the App icon to system tray
+  {$ENDIF}
   Application.CreateForm(TMain, Main);
   Application.CreateForm(TTicket, Ticket);
   Application.Run;

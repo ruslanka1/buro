@@ -26,14 +26,19 @@ uses
 //  DBCtrlsEh,
 //  DBGridEhGrouping, 
 //  GridsEh, DBGridEh, 
-  DB,
+  DB, DBGrids,
+  DateTimePicker
 //  ADODB,
-//  MemDB, 
+  , SQLDB
+//  MemDB,
+  , MemDS
 //  ssWorks, SSheets, 
+  {$IFDEF INDY}
   IdIOHandler, IdIOHandlerSocket, IdIOHandlerStack,
   IdSSL, IdSSLOpenSSL, IdMessage, IdBaseComponent, IdComponent, IdTCPConnection,
   IdTCPClient, IdExplicitTLSClientServerBase, IdMessageClient, IdSMTPBase,
   IdSMTP
+  {$ENDIF}
   ;
 {$ENDIF}
 
@@ -50,7 +55,12 @@ type
     pcPGS: TPageControl;
     tsPerson: TTabSheet;
     tsTurn: TTabSheet;
+    {$IFDEF MSWINDOWS}
     grdTurn: TDBGridEh;
+    {$ENDIF}
+    {$IFDEF UNIX}
+    grdTurn: TDBGrid;
+    {$ENDIF}
     imgPerson: TImage;
     sbTurn: TStatusBar;
     pnlTurn: TPanel;
@@ -77,8 +87,14 @@ type
     edOLD: TEdit;
     lblROOM: TLabel;
     edROOM: TEdit;
+    {$IFDEF MSWINDOWS}
     edBDATE: TDBDateTimeEditEh;
     edDTDOC: TDBDateTimeEditEh;
+    {$ENDIF}
+    {$IFDEF UNIX}
+    edBDATE: TDateTimePicker;
+    edDTDOC: TDateTimePicker;
+    {$ENDIF}
     lblTicket: TLabel;
     edTicket: TEdit;
     stStatus: TStaticText;
@@ -88,15 +104,20 @@ type
     edDOCNUM: TEdit;
     lblGOAL: TLabel;
     edGOAL: TEdit;
-    stStatus: TPanel;
+//    stStatus: TPanel;
     tsList: TTabSheet;
     lblEvaID: TLabel;
     edEvaID: TEdit;
     btnEvaID: TButton;
-    pnlTurn: TPanel;
-    grdTurn: TDBGridEh;
-    sbTurn: TStatusBar;
+//    pnlTurn: TPanel;
+//    grdTurn: TDBGridEh;
+//    sbTurn: TStatusBar;
+    {$IFDEF MSWINDOWS}
     mt: TMemTable;
+    {$ENDIF}
+    {$IFDEF UNIX}
+    mt: TMemDataset;
+    {$ENDIF}
     mtNUM: TStringField;
     mtROOM: TStringField;
     mtLNAME: TStringField;
@@ -107,17 +128,31 @@ type
     btnTurnRefresh: TButton;
     pnlEva: TPanel;
     btnEvaRefresh: TButton;
+    {$IFDEF MSWINDOWS}
     grdEva: TDBGridEh;
     sbEva: TStatusBar;
     mtReg: TMemTable;
+    {$ENDIF}
+    {$IFDEF UNIX}
+    grdEva: TDBGrid;
+    sbEva: TStatusBar;
+    mtReg: TMemDataset;
+    {$ENDIF}
     mtRegNumReg: TIntegerField;
     mtRegNmReg: TStringField;
     mtRegBdReg: TIntegerField;
     mtRegConnect: TStringField;
     dsReg: TDataSource;
+    {$IFDEF MSWINDOWS}
     MSBase: TADOConnection;
     qReg: TADOQuery;
     ssw: TSSWriter;
+    {$ENDIF}
+    {$IFDEF UNIX}
+    MSBase: TSQLConnector;
+    qReg: TSQLQuery;
+//    ssw: TSSWriter;
+    {$ENDIF}
     lblEvaIP: TLabel;
     edEvaIP: TEdit;
     lblEvaBD: TLabel;
@@ -249,10 +284,15 @@ begin
   edFNAME.Text:= '';
   edSNAME.Text:= '';
   edSEX.Text:= '';
+  {$IFDEF MSWINDOWS}
   edBDATE.Text:= '';
+  edDTDOC.Text:= '';
+  {$ELSE}
+  edBDATE.Date:= NullDate;
+  edDTDOC.Date:= NullDate;
+  {$ENDIF}
   edBPLACE.Text:= '';
   edWhDOC.Text:= '';
-  edDTDOC.Text:= '';
   edCODEDOC.Text:= '';
   edMAIL.Text:= '';
   edOLD.Text:= '';
