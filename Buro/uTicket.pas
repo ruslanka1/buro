@@ -51,7 +51,12 @@ var
 
 implementation
 
+{$IFDEF MSWINDOWS}
 {$R *.dfm}
+{$ENDIF}
+{$IFDEF UNIX}
+{$R *.lfm}
+{$ENDIF}
 
 procedure TTicket.btnPrintClick(Sender: TObject);
 var ht: integer;

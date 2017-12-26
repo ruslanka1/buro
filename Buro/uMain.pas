@@ -8,13 +8,21 @@ interface
 
 {$IFDEF MSWINDOWS}
 uses
-  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
-  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.Mask, DBCtrlsEh,
-  Vcl.ExtCtrls, DBGridEhGrouping, GridsEh, DBGridEh, Vcl.ComCtrls, Data.DB,
-  MemDB, ssWorks, SSheets, IdIOHandler, IdIOHandlerSocket, IdIOHandlerStack,
+  Winapi.Windows, Winapi.Messages,
+  System.SysUtils, System.Variants, System.Classes,
+  Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.Mask,
+  Vcl.ComCtrls, Vcl.ExtCtrls,
+  DBCtrlsEh,
+  DBGridEhGrouping, GridsEh, DBGridEh, Data.DB,
+  MemDB,
+  ssWorks, SSheets,
+  IdIOHandler, IdIOHandlerSocket, IdIOHandlerStack,
   IdSSL, IdSSLOpenSSL, IdMessage, IdBaseComponent, IdComponent, IdTCPConnection,
   IdTCPClient, IdExplicitTLSClientServerBase, IdMessageClient, IdSMTPBase,
-  IdSMTP, Data.Win.ADODB;
+  IdSMTP,
+  Data.Win.ADODB
+  ;
 {$ENDIF}
 {$IFDEF UNIX}
 uses
@@ -225,12 +233,18 @@ uses System.IniFiles, Winapi.shellapi, JPEG, System.Win.Registry,
      System.DateUtils, System.Math, uTicket, System.StrUtils ;
 {$ELSE}
 uses IniFiles,
-     DateUtils, Math, StrUtils
+     DateUtils, StrUtils
+//     , Math
      , Process
      , uTicket;
 {$ENDIF}
 
+{$IFDEF MSWINDOWS}
 {$R *.dfm}
+{$ENDIF}
+{$IFDEF UNIX}
+{$R *.lfm}
+{$ENDIF}
 
 procedure TMain.btnEvaRefreshClick(Sender: TObject);
 begin
@@ -251,6 +265,11 @@ procedure TMain.btnPrintClick(Sender: TObject);
 begin
   save;
   init_ticket;
+end;
+
+procedure TMain.btnSendClick(Sender: TObject);
+begin
+  //FIXME: not used here any more
 end;
 
 procedure TMain.btnScanClick(Sender: TObject);
@@ -316,18 +335,23 @@ end;
 procedure TMain.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
   SaveDir;
+  Action := caFree;
 end;
 
 procedure TMain.FormShow(Sender: TObject);
 var dir: string;
 begin
   LoadDir;
-  app_dir:= ExtractFilePath(Application.ExeName);
-  edTicket.Text:= IntToStr(f_ticket);
-  dir:= app_dir+'\About.jpg';
+  app_dir := ExtractFilePath (Application.ExeName);
+  edTicket.Text := IntToStr(f_ticket);
+  {$IFDEF MSWINDOWS}
+  dir:= app_dir + '\' + 'About.jpg';
+  {$ELSE}
+  dir:= app_dir + '/' + 'About.jpg';
+  {$ENDIF}
   imgPerson.Picture.LoadFromFile(dir);
   imgPerson.Show;
-  pcPGS.ActivePage:= tsPerson;
+   pcPGS.ActivePage:= tsPerson;
 end;
 
 function TMain.set_barcode(s_num: string): string;
@@ -391,12 +415,24 @@ begin
     Ini.WriteString('Person','lname',edLNAME.Text);
     Ini.WriteString('Person','sname',edSNAME.Text);
     Ini.WriteString('Person','sex',edSEX.Text);
+    {$IFDEF MSWINDOWS}
     if (edBDATE.Value <> null) then
       Ini.WriteDate  ('Person','bdate',edBDATE.Value);
+    {$ENDIF}
+    {$IFDEF UNIX}
+    if (edBDATE.Date <> NullDate) then
+      Ini.WriteDate  ('Person','bdate',edBDATE.Date);
+    {$ENDIF}
     Ini.WriteString('Person','bplase',edBPLACE.Text);
     Ini.WriteString('Person','whdoc',edWhDOC.Text);
+    {$IFDEF MSWINDOWS}
     if (edDTDOC.Value <> null) then
       Ini.WriteDate  ('Person','dtdoc',edDTDOC.Value);
+    {$ENDIF}
+    {$IFDEF UNIX}
+    if (edDTDOC.Date <> NullDate) then
+      Ini.WriteDate  ('Person','dtdoc',edDTDOC.Date);
+    {$ENDIF}
     Ini.WriteString('Person','coddoc',edCODEDOC.Text);
     Ini.WriteString('Person','mail',edMAIL.Text);
     Ini.WriteString('Person','room',edROOM.Text);
@@ -441,11 +477,21 @@ begin
     edFNAME.Text := trim(lst.Values ['Name']);
     edSNAME.Text := trim(lst.Values ['Patronymic']);
     edSEX.Text := trim(lst.Values ['Gender']);
+    {$IFDEF MSWINDOWS}
     edBDATE.Text := trim(lst.Values ['Birthdate']);
+    {$ENDIF}
+    {$IFDEF UNIX}
+    edBDATE.Date := StrToDate (trim(lst.Values ['Birthdate']));
+    {$ENDIF}
     edBPLACE.Text := trim(lst.Values ['Birthplace']);
     edWhDOC.Text := trim(lst.Values ['Authority']);
     edCODEDOC.Text := trim(lst.Values ['Authority code']);
+    {$IFDEF MSWINDOWS}
     edDTDOC.Text := trim(lst.Values ['Issue date']);
+    {$ENDIF}
+    {$IFDEF UNIX}
+    edDTDOC.Date := StrToDate (trim(lst.Values ['Issue date']));
+    {$ENDIF}
   finally
     lst.Free;
     calc_old;
@@ -470,7 +516,21 @@ begin
   Application.MessageBox('Îòïðàâëÿþ...','Âíèìàíèå');
 end;
 
-function runAndWait (nm: string): Boolean;
+function Implode (separator: String; params: array of String): String;
+var
+  comma : String;
+  n     : Integer;
+begin
+  Result := '';
+  comma  := '';
+  for n := Low (params) to High (params) do
+  begin
+    Result := Result + comma + params[n];
+    comma  := separator
+  end
+end;
+
+function runAndWait (nm: string; params: array of String): Boolean;
 {$IFDEF MSWINDOWS}
 var
   SEInfo: TShellExecuteInfo;
@@ -514,7 +574,7 @@ begin
 {$ELSE}
 var output : ansistring;
 begin
-  Result := RunCommand ('/bin/bash',['-c', nm], output) ;
+  Result := RunCommand ('/bin/bash',['-c', nm, Implode (' ', params)], output) ;
 //FIXME: save the output
 //  if Result then
 //     writeln (output);
@@ -556,7 +616,7 @@ end;
 class function Sys.OSVersion () : String;
  var
   osErr   : integer;
-  response: longint;
+//  response: longint;
 begin
   {$IFDEF LCLcarbon}
   OSVersion := 'Mac OS X 10.';
@@ -587,7 +647,7 @@ end;
 
 class function Sys.command    (cmd: String; args: array of String) : Boolean;
 begin
-  Result := runAndWait (cmd);
+  Result := runAndWait (cmd, args);
 end;
 
 //
@@ -605,7 +665,7 @@ begin
       'W': urlOpen := 'start'   ; // Windows
       else urlOpen := 'xdg-open'; // FIXME: just hope it's true...
     end;
-    Sys.command (urlOpen, [url]);
+    Result := Sys.command (urlOpen, [url]);
 end;
 
 
@@ -616,7 +676,7 @@ begin
     stStatus.Caption := 'Идёт сканирование...';
     Application.ProcessMessages;
 
-    if runAndWait (nm) then
+    if runAndWait (nm, []) then
       stStatus.Caption := 'Сканирование закончено.'
     else
       ShowMessage ('Сканирование не запустилось...')
@@ -667,6 +727,7 @@ var
   //FIXME: introduce application configuration
 {$ENDIF}
 begin
+  {$IFDEF MSWINDOWS}
   // Ñ÷èòûâàåì ïóòè èç ðååñòðà
   Reg:= TRegIniFile.Create('Software');
   try
@@ -692,9 +753,9 @@ begin
     inc(f_ticket);
     Reg.Free;
   end;
-{$ELSE}
+  {$ELSE}
   //FIXME: load configuration
-{$ENDIF}
+  {$ENDIF}
 end;
 
 procedure TMain.mtAfterScroll(DataSet: TDataSet);
@@ -765,7 +826,7 @@ var
       fXML.Add('    <LNAME>'+sxml(edLNAME.Text)+'</LNAME>');
       fXML.Add('    <FNAME>'+sxml(edFNAME.Text)+'</FNAME>');
       fXML.Add('    <SNAME>'+sxml(edSNAME.Text)+'</SNAME>');
-      fXML.Add('    <BDATE>'+sxml(edBDATE.Text)+'</BDATE>');
+      fXML.Add('    <BDATE>'+sxml(FormatDateTime ('%y-%m-%d', edBDATE.Date))+'</BDATE>');
       fXML.Add('    <GOAL>'+sxml(edGOAL.Text)+'</GOAL>');
     finally
       fXML.Add('  </Person>');
@@ -905,13 +966,17 @@ begin
 end;
 
 procedure TMain.GetConLst;
-const
-  CONLOG = 'ConLog.txt';
-  CON = 'Provider=SQLOLEDB.1;Password=%s;Persist Security Info=True;User ID=%s;Initial Catalog=%s;Data Source=%s';
+//const
+//  CONLOG = 'ConLog.txt';
+//  CON = 'Provider=SQLOLEDB.1;Password=%s;Persist Security Info=True;User ID=%s;Initial Catalog=%s;Data Source=%s';
 var
-  ConStr, us, ps, ct, ds, dn, lg: string;
+//  ConStr, ct, lg: string;
+  us, ps, ds, dn: string;
+  {$IFDEF UNIX}
+  AvailableConnections: TStringList;
+  {$ENDIF}
 begin
-  lg:= '';
+//  lg:= '';
   stStatus.Caption:= '';
   MSBase.Close;
   mtReg.Close;
@@ -919,19 +984,36 @@ begin
 
   us := Trim('mseUser');      // user
   ps := Trim('123mse123');    // password
-  ct := Trim(edEvaBD.Text);   // èìÿ ÁÄ ÅÀÂÈÈÀÑ ÌÑÝ
+//  ct := Trim(edEvaBD.Text);   // èìÿ ÁÄ ÅÀÂÈÈÀÑ ÌÑÝ
   ds := Trim(edEvaIP.Text);   // àäðåñ MS SQL
   dn := Trim(edEvaPort.Text); // ïîðò MS SQL
 
-  ConStr:= '';
+//  ConStr:= '';
 
   if (ds <> '') and (dn <> '') then
     ds:= ds + ', ' + dn;
 
   if ds <> '' then
   begin
+    try
+    {$IFDEF MSWINDOWS}
     ConStr:= Format(CON,[ps,us,ct,ds]);
     MSBase.ConnectionString:= ConStr;
+    {$ENDIF}
+    {$IFDEF UNIX}
+//    ConStr:= Format(CON,[ps,us,ct,ds]);
+    AvailableConnections := TStringList.Create;
+    GetConnectionList (AvailableConnections);
+    MSBase.ConnectorType := AvailableConnections[0]; //FIXME: I hope, ms-sql
+    MSBase.HostName:=ds;
+    MSBase.UserName:=us;
+    MSBase.Password:=ps;
+    {$ENDIF}
+    finally
+    {$IFDEF UNIX}
+    AvailableConnections.Free;
+    {$ENDIF}
+    end;
     try
       MSBase.Open;     // Òåñò
       qReg.Close;
