@@ -826,7 +826,7 @@ var
       fXML.Add('    <LNAME>'+sxml(edLNAME.Text)+'</LNAME>');
       fXML.Add('    <FNAME>'+sxml(edFNAME.Text)+'</FNAME>');
       fXML.Add('    <SNAME>'+sxml(edSNAME.Text)+'</SNAME>');
-      fXML.Add('    <BDATE>'+sxml(FormatDateTime ('%y-%m-%d', edBDATE.Date))+'</BDATE>');
+      fXML.Add('    <BDATE>'+sxml(FormatDateTime ('yyyy-mm-dd hh:mm:ss', edBDATE.Date))+'</BDATE>');
       fXML.Add('    <GOAL>'+sxml(edGOAL.Text)+'</GOAL>');
     finally
       fXML.Add('  </Person>');
