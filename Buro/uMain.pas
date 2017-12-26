@@ -201,12 +201,12 @@ type
     procedure srun(nm: string);
     procedure init_ticket;
     function  set_barcode(s_num: string): string;
-    procedure SaveDir;     // Ñîõðàíÿåì ïóòè â ðååñòð
-    procedure LoadDir;     // Ñ÷èòûâàåì ïóòè èç ðååñòðà
+    procedure SaveDir;     // Сохраняем пути в реестр
+    procedure LoadDir;     // Считываем пути из реестра
     procedure save_eva(dt: TDateTime);
     procedure CrtXML(dt: TDateTime);
-    procedure turn_refresh;// Ïåðå÷èòàòü î÷åðåäü
-    procedure turn_write(lst: TStringList);  // Çàïèñàòü î÷åðåäü
+    procedure turn_refresh;// Перечитать очередь
+    procedure turn_write(lst: TStringList);  // Записать очередь
     procedure GetConLst;
     procedure GetAllFiles(Path: string; Lb: TStringList; All: boolean=False);
   public
@@ -253,7 +253,7 @@ end;
 
 procedure TMain.btnEvaIDClick(Sender: TObject);
 begin
-  Application.MessageBox('Ïîèñê â ÅÀÂÈÈÀÑ...','Âíèìàíèå');
+  Application.MessageBox('Поиск в ЕАВИИАС...','Внимание');
 end;
 
 procedure TMain.btnNewClick(Sender: TObject);
@@ -365,7 +365,7 @@ procedure TMain.init_ticket;
 begin
   Ticket.mmOrg.Lines.Text:= trim(mmOrg.Lines.Text);
   Ticket.lblDate.Caption := FormatDateTime('dd.mm.yyyy', date);
-  Ticket.lblRoom.Caption:= 'Êàáèíåò ¹ ' + edROOM.Text;
+  Ticket.lblRoom.Caption:= 'Кабинет ' + edROOM.Text;
   Ticket.lblNumber.Caption:= set_barcode(edTicket.Text);
   Ticket.lblBarcode.Caption:= Ticket.lblNumber.Caption;
   Ticket.fdir:= FDIR+'\'+FormatDateTime('yyyy-mm-dd', now)+'\'+Format('%.3d', [f_ticket]);
@@ -381,7 +381,7 @@ var
 begin
   if not DirectoryExists(FDIR) then
   begin
-    stStatus.Caption:=  'Íåò ïîäêëþ÷åíèÿ ê õðàíèëèùó !';
+    stStatus.Caption:=  'Нет подключения к хранилищу !';
     stStatus.Color:= clFuchsia;
     Application.ProcessMessages;
     exit;
@@ -390,7 +390,7 @@ begin
   c_dir:= FDIR+'\'+FormatDateTime('yyyy-mm-dd', now);
   if (not DirectoryExists(c_dir)) and (not CreateDir(c_dir)) then
   begin
-    stStatus.Caption:=  'Íåò âîçìîæíîñòè íà÷àòü ðåãèñòðàöèþ íà ñåãîäíÿ !';
+    stStatus.Caption:=  'Нет возможности начать регистрацию на сегодня !';
     stStatus.Color:= clFuchsia;
     Application.ProcessMessages;
     exit;
@@ -399,7 +399,7 @@ begin
   c_dir:= c_dir+'\'+Format('%.3d', [f_ticket]);  //IntToStr(f_ticket);
   if (not DirectoryExists(c_dir)) and (not CreateDir(c_dir)) then
   begin
-    stStatus.Caption:=  'Íåò âîçìîæíîñòè ñîõðàíèòü ðåãèñòðàöèþ ïîñåòèòåëÿ !';
+    stStatus.Caption:=  'Нет возможности сохранить регистрацию посетителя !';
     stStatus.Color:= clFuchsia;
     Application.ProcessMessages;
     exit;
@@ -461,8 +461,8 @@ begin
     // WinExec('D:\AISU\[PRJS]\MSE\Buro\Buro\Win32\Debug\pscan.exe',SW_RESTORE)
     srun(s)
   else
-    Application.MessageBox('Ïðîãðàììà ñêàíèðîâàíèÿ íå íàéäåíà...','Âíèìàíèå');
-  stStatus.Caption:= '×èòàþ...';
+    Application.MessageBox('Программа сканирования не найдена...','Внимание');
+  stStatus.Caption:= 'Читаю...';
   Application.ProcessMessages;
   s :=  app_dir+'scanned.txt';
   lst:= TStringList.Create;
@@ -507,7 +507,7 @@ begin
   s :=  app_dir+'scanned.jpg';
   s_out:= FDIR+'\'+FormatDateTime('yyyy-mm-dd', now)+'\'+edTicket.Text;
   if not CopyFile(PChar(s),PChar(s_out),False) then
-    Application.MessageBox('Îøèáêà êîïèðîâàíèÿ ñêàíà...','Âíèìàíèå');
+    Application.MessageBox('Ошибка копирования скана...','Внимание');
 *)
 end;
 
@@ -728,7 +728,7 @@ var
 {$ENDIF}
 begin
   {$IFDEF MSWINDOWS}
-  // Ñ÷èòûâàåì ïóòè èç ðååñòðà
+  // Считываем пути из реестра
   Reg:= TRegIniFile.Create('Software');
   try
     Reg.OpenKey(ExtractFileName(ParamStr(0)), true);
@@ -767,18 +767,18 @@ procedure TMain.save_eva(dt: TDateTime);
 begin
   if not DirectoryExists(FEVA) then
   begin
-    stStatus.Caption:=  'Íåò ïîäêëþ÷åíèÿ ê õðàíèëèùó ÅÀÂÈÈÀÑ!';
+    stStatus.Caption:=  'Нет подключения к хранилищу ЕАВИИАС!';
     stStatus.Color:= clFuchsia;
     Application.ProcessMessages;
     exit;
   end;
 
-  stStatus.Caption:= 'Âûãðóæàåì â XML...';
+  stStatus.Caption:= 'Выгружаем в XML...';
   Application.ProcessMessages;
   try
     CrtXML(dt);
   finally
-    stStatus.Caption:= 'Ãîòîâî!';
+    stStatus.Caption:= 'В ЕАВИИАС направлено!';
     Application.ProcessMessages;
     sleep(1000);
     stStatus.Caption:= '';
@@ -802,6 +802,7 @@ var
   procedure XmlHeader;
   begin
     fXML.Clear;
+    //FIXME: use utf-8 for unix here ???
     fXML.Add('<?xml version="1.0" encoding="WINDOWS-1251"?>');
     fXML.Add('<EVA xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">');
     fXML.Add('  <PackageAttrs>');
@@ -984,9 +985,9 @@ begin
 
   us := Trim('mseUser');      // user
   ps := Trim('123mse123');    // password
-//  ct := Trim(edEvaBD.Text);   // èìÿ ÁÄ ÅÀÂÈÈÀÑ ÌÑÝ
-  ds := Trim(edEvaIP.Text);   // àäðåñ MS SQL
-  dn := Trim(edEvaPort.Text); // ïîðò MS SQL
+//  ct := Trim(edEvaBD.Text);   // имя БД ЕАВИИАС МСЭ
+  ds := Trim(edEvaIP.Text);   // адрес MS SQL
+  dn := Trim(edEvaPort.Text); // порт MS SQL
 
 //  ConStr:= '';
 
@@ -1005,9 +1006,9 @@ begin
     AvailableConnections := TStringList.Create;
     GetConnectionList (AvailableConnections);
     MSBase.ConnectorType := AvailableConnections[0]; //FIXME: I hope, ms-sql
-    MSBase.HostName:=ds;
-    MSBase.UserName:=us;
-    MSBase.Password:=ps;
+    MSBase.HostName := ds;
+    MSBase.UserName := us;
+    MSBase.Password := ps;
     {$ENDIF}
     finally
     {$IFDEF UNIX}
@@ -1015,12 +1016,12 @@ begin
     {$ENDIF}
     end;
     try
-      MSBase.Open;     // Òåñò
+      MSBase.Open;     // Тест
       qReg.Close;
       qReg.Open;
     except
       on E: Exception do
-        stStatus.Caption:= 'Îøèáêà ïîäêëþ÷åíèÿ ê ÅÀÂÈÈÀÑ ( '+E.Message +' )';
+        stStatus.Caption:= 'Ошибка подключения к ЕАВИИАС ( '+E.Message +' )';
     end;
       Application.ProcessMessages;
   end;
