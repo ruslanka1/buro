@@ -9,7 +9,7 @@
 *.pdf
 *.xls
 *.html
-*.dproj
+### *.dproj
 *.dproj.local
 *.dsk
 *.identcache
