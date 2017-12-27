@@ -15,7 +15,7 @@
 *.identcache
 *.ico
 *.bak
-# Lazaros artefacts:
+# Lazarus artefacts:
 *.compiled
 *.lps
 *.o
