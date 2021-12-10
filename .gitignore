@@ -9,7 +9,7 @@
 *.pdf
 *.xls
 *.html
-### *.dproj
+# *.dproj
 *.dproj.local
 *.dsk
 *.identcache
@@ -50,14 +50,15 @@
 # images/*
 __history
 Win32
-buro/__history/*
-check/__history/*
-tablo/__history/*
-Turn/__history/*
-Prev/__history/*
-Room-q/TestConn/__history/*
-Room-q/Room-q/__history/*
 _Docs/src/*
+#buro/__history/*
+#check/__history/*
+#tablo/__history/*
+#Turn/__history/*
+#Prev/__history/*
+#Room-q/TestConn/__history/*
+#Room-q/Room-q/__history/*
+
 */backup/*
 */ConverterBackup/*
 # Игнорирование ВСЕХ html-файлов в ОДНОЙ КОНКРЕТНОЙ директории(НЕ ВКЛЮЧАЯ поддиректории)
