@@ -7,7 +7,8 @@ uses
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, IdIOHandler,
   IdIOHandlerSocket, IdIOHandlerStack, IdSSL, IdSSLOpenSSL, IdMessage, IdAttachment, IdAttachmentFile,
   IdBaseComponent, IdComponent, IdTCPConnection, IdTCPClient,
-  IdExplicitTLSClientServerBase, IdMessageClient, IdSMTPBase, IdSMTP;
+  IdExplicitTLSClientServerBase, IdMessageClient, IdSMTPBase, IdSMTP,
+  Vcl.ComCtrls;
 
 type
   TTicket = class(TForm)
@@ -22,11 +23,19 @@ type
     IdSMTP: TIdSMTP;
     IdMes: TIdMessage;
     IdSSL: TIdSSLIOHandlerSocketOpenSSL;
-    lblTime: TLabel;
+    lblInTimeNM: TLabel;
+    lblNum: TLabel;
+    pcPGS: TPageControl;
+    tsTicket: TTabSheet;
+    tsAgree: TTabSheet;
+    btnPrintAgree: TButton;
+    mmAgree: TMemo;
+    lblGoal: TLabel;
     procedure btnPrintClick(Sender: TObject);
     procedure btnSendClick(Sender: TObject);
     procedure btnPrintSendClick(Sender: TObject);
     procedure FormShow(Sender: TObject);
+    procedure btnPrintAgreeClick(Sender: TObject);
   private
     { Private declarations }
     procedure scr_sh;
@@ -35,7 +44,11 @@ type
   public
     { Public declarations }
     fdir,
-    femail: string;
+    femail,
+    fnum,
+    fvisitor,
+    foperator: string;
+    fview: boolean;
   end;
 
 var
@@ -45,41 +58,68 @@ implementation
 
 {$R *.dfm}
 
+procedure TTicket.btnPrintAgreeClick(Sender: TObject);
+var s: string;
+begin
+  s:= mmAgree.Text;
+  mmAgree.Text:= StringReplace(mmAgree.Text,'%visitor%',fvisitor,[]);
+  mmAgree.Text:= StringReplace(mmAgree.Text,'%operator%',foperator,[]);
+  mmAgree.Text:= StringReplace(mmAgree.Text,'%data%',lblDate.Caption,[]);
+  mmAgree.Text:= StringReplace(mmAgree.Text,'%num%',fnum,[]);
+  pcPGS.ActivePage:= tsAgree;
+  try
+    Application.ProcessMessages;
+    //sleep(10000);
+    print;
+    if not fview then
+      btnPrintClick(Sender);
+  finally
+    pcPGS.ActivePage:= tsTicket;
+    mmAgree.Text:= s;
+  end;
+end;
+
 procedure TTicket.btnPrintClick(Sender: TObject);
-var ht: integer;
+//var ht: integer;
 begin
   btnPrint.Hide;
+  btnPrintAgree.Hide;
   btnSend.Hide;
   btnPrintSend.Hide;
-  ht:= mmOrg.Height;
+  lblNum.Show;
+//  ht:= mmOrg.Height;
   try
-    mmOrg.Height:= btnPrint.Top - mmOrg.Top + btnPrint.Height;
+    // Org.Height:= btnPrint.Top - mmOrg.Top + btnPrint.Height;
     Application.ProcessMessages;
     print;
   finally
-    mmOrg.Height:= ht;
+//    mmOrg.Height:= ht;
     btnPrint.Show;
+    btnPrintAgree.Show;
     btnSend.Show;
     btnPrintSend.Show;
+    lblNum.Hide;
 //    Hide;
   end;
 end;
 
 procedure TTicket.btnPrintSendClick(Sender: TObject);
-var ht: integer;
+//var ht: integer;
 begin
   btnPrint.Hide;
+  btnPrintAgree.Hide;
   btnSend.Hide;
   btnPrintSend.Hide;
-  ht:= mmOrg.Height;
+  // ht:= mmOrg.Height;
   try
-    mmOrg.Height:= btnPrint.Top - mmOrg.Top + btnPrint.Height;
+    // mmOrg.Height:= btnPrint.Top - mmOrg.Top + btnPrint.Height;
     Application.ProcessMessages;
     send;
     print;
   finally
-    mmOrg.Height:= ht;
+    // mmOrg.Height:= ht;
     btnPrint.Show;
+    btnPrintAgree.Show;
     btnSend.Show;
     btnPrintSend.Show;
 //    Hide;
@@ -87,19 +127,21 @@ begin
 end;
 
 procedure TTicket.btnSendClick(Sender: TObject);
-var ht: integer;
+//var ht: integer;
 begin
   btnPrint.Hide;
+  btnPrintAgree.Hide;
   btnSend.Hide;
   btnPrintSend.Hide;
-  ht:= mmOrg.Height;
+  // ht:= mmOrg.Height;
   try
-    mmOrg.Height:= btnPrint.Top - mmOrg.Top + btnPrint.Height;
+    // mmOrg.Height:= btnPrint.Top - mmOrg.Top + btnPrint.Height;
     Application.ProcessMessages;
     send;
   finally
-    mmOrg.Height:= ht;
+    // mmOrg.Height:= ht;
     btnPrint.Show;
+    btnPrintAgree.Show;
     btnSend.Show;
     btnPrintSend.Show;
 //    Hide;
@@ -109,14 +151,17 @@ end;
 procedure TTicket.FormShow(Sender: TObject);
 var mail: boolean;
 begin
+  pcPGS.ActivePage:= tsTicket;
   btnPrint.Show;
+  btnPrintAgree.Show;
   btnSend.Show;
   btnPrintSend.Show;
 
   mail:= not(femail = '') and (pos('@', femail) > 0);
-  btnPrint.Enabled    := True;
-  btnSend.Enabled     := mail;
-  btnPrintSend.Enabled:= mail;
+  btnPrint.Enabled     := True;
+  btnPrintAgree.Enabled:= True;
+  btnSend.Enabled      := mail;
+  btnPrintSend.Enabled := mail;
 end;
 
 procedure TTicket.scr_sh;

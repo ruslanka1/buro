@@ -23,6 +23,13 @@
 *.ppu
 *.pas.w
 *.~dsk
+*.dsk
+*.res
+*.exe
+*.dcu
+*~$*
+*.tmp
+*.vlb
 # Игнорирование файла во ВСЕХ директориях
 # Например /params/db/config.php, /config.php
 # config.php
@@ -41,15 +48,16 @@
 # Игнорирование всех файлов и папок в ЛЮБЫХ директориях с указанным именем
 # Например /images/user.jpg, /core/images/user.jpg
 # images/*
-buro/dcu/*
-buro/Win32/*
+__history
+Win32
 buro/__history/*
-check/dcu/*
-check/Win32/*
 check/__history/*
-tablo/dcu/*
-tablo/Win32/*
 tablo/__history/*
+Turn/__history/*
+Prev/__history/*
+Room-q/TestConn/__history/*
+Room-q/Room-q/__history/*
+_Docs/src/*
 */backup/*
 */ConverterBackup/*
 # Игнорирование ВСЕХ html-файлов в ОДНОЙ КОНКРЕТНОЙ директории(НЕ ВКЛЮЧАЯ поддиректории)

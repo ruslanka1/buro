@@ -1,16 +1,16 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <BorlandProject>
 	<Transactions>
-    <Transaction>1899.12.30 00:00:00.000.367,D:\AISU\[PRJS]\MSE\Buro\Check\uMain.dfm=D:\AISU\[PRJS]\MSE\Buro\Check\main.dfm</Transaction>
-    <Transaction>1899.12.30 00:00:00.000.029,D:\AISU\[PRJS]\MSE\Buro\Check\main.pas=C:\Users\Kadrileev_rr\Documents\RAD Studio\Projects\Unit1.pas</Transaction>
-    <Transaction>1899.12.30 00:00:00.000.367,D:\AISU\[PRJS]\MSE\Buro\Check\uMain.pas=D:\AISU\[PRJS]\MSE\Buro\Check\main.pas</Transaction>
-    <Transaction>1899.12.30 00:00:00.000.323,D:\AISU\[PRJS]\MSE\Buro\Buro\Unit1.pas=D:\AISU\[PRJS]\MSE\buro\Buro\uTicket.pas</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.367,D:\AISU\[PRJS]\MSE\Buro\Check\main.pas=D:\AISU\[PRJS]\MSE\Buro\Check\uMain.pas</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.811,D:\AISU\[PRJS]\MSE\Buro\Buro\reg.dproj=D:\AISU\[PRJS]\MSE\Buro\Buro\Check.dproj</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.323,D:\AISU\[PRJS]\MSE\buro\Buro\uTicket.dfm=D:\AISU\[PRJS]\MSE\Buro\Buro\Unit1.dfm</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.029,C:\Users\Kadrileev_rr\Documents\RAD Studio\Projects\Unit1.dfm=D:\AISU\[PRJS]\MSE\Buro\Check\main.dfm</Transaction>
     <Transaction>1899.12.30 00:00:00.000.852,=D:\AISU\[PRJS]\MSE\Buro\Buro\Unit1.pas</Transaction>
-    <Transaction>1899.12.30 00:00:00.000.188,D:\AISU\[PRJS]\MSE\Buro\Buro\reg.dproj=D:\AISU\[PRJS]\MSE\Buro\Buro\buro.dproj</Transaction>
-    <Transaction>1899.12.30 00:00:00.000.029,D:\AISU\[PRJS]\MSE\Buro\Check\main.dfm=C:\Users\Kadrileev_rr\Documents\RAD Studio\Projects\Unit1.dfm</Transaction>
-    <Transaction>1899.12.30 00:00:00.000.811,D:\AISU\[PRJS]\MSE\Buro\Buro\Check.dproj=D:\AISU\[PRJS]\MSE\Buro\Buro\reg.dproj</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.323,D:\AISU\[PRJS]\MSE\buro\Buro\uTicket.pas=D:\AISU\[PRJS]\MSE\Buro\Buro\Unit1.pas</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.367,D:\AISU\[PRJS]\MSE\Buro\Check\main.dfm=D:\AISU\[PRJS]\MSE\Buro\Check\uMain.dfm</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.801,C:\Users\Kadrileev_rr\Documents\RAD Studio\Projects\Project1.dproj=D:\AISU\[PRJS]\MSE\Buro\Check\Check.dproj</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.029,C:\Users\Kadrileev_rr\Documents\RAD Studio\Projects\Unit1.pas=D:\AISU\[PRJS]\MSE\Buro\Check\main.pas</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.188,D:\AISU\[PRJS]\MSE\Buro\Buro\buro.dproj=D:\AISU\[PRJS]\MSE\Buro\Buro\reg.dproj</Transaction>
     <Transaction>1899.12.30 00:00:00.000.966,=C:\Users\Kadrileev_rr\Documents\RAD Studio\Projects\Unit1.pas</Transaction>
-    <Transaction>1899.12.30 00:00:00.000.323,D:\AISU\[PRJS]\MSE\Buro\Buro\Unit1.dfm=D:\AISU\[PRJS]\MSE\buro\Buro\uTicket.dfm</Transaction>
-    <Transaction>1899.12.30 00:00:00.000.801,D:\AISU\[PRJS]\MSE\Buro\Check\Check.dproj=C:\Users\Kadrileev_rr\Documents\RAD Studio\Projects\Project1.dproj</Transaction>
   </Transactions>
 </BorlandProject>
